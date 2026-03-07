@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import {  useRef } from "react";
 import { Canvas } from "fabric";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 const OrderDetails = () => {
   const { id } = useParams();
@@ -51,6 +52,13 @@ const OrderDetails = () => {
 
   return (
     <div className="p-6">
+
+        <Link
+  to="/admin/orders"
+  className="inline-block mb-4 text-blue-600 underline"
+>
+← Back to Orders
+</Link>
 
       <h1 className="text-2xl font-bold mb-6">Order Details</h1>
 

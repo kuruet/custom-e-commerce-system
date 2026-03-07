@@ -54,14 +54,18 @@ const OrdersList = () => {
     <td className="p-3 border">{order._id}</td>
     <td className="p-3 border">{order.customer?.name}</td>
     <td className="p-3 border">₹{order.totalPrice}</td>
-    <td className="p-3 border">{order.status}</td>
+  <td className="p-3 border">
+  <span className="px-3 py-1 bg-yellow-200 text-yellow-800 rounded text-sm">
+    {order.status}
+  </span>
+</td>
     <td className="p-3 border">
-      <Link
-        to={`/admin/orders/${order._id}`}
-        className="text-blue-600 underline font-semibold"
-      >
-        View
-      </Link>
+   <Link
+  to={`/admin/orders/${order._id}`}
+  className="px-3 py-1 bg-blue-600 text-white rounded text-sm"
+>
+  View
+</Link>
     </td>
   </tr>
 ))}
