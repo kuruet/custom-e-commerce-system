@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import requestLogger from "./middleware/requestLogger.js";
 import errorHandler from "./middleware/errorHandler.js";
-
+import productRoutes from "./modules/products/product.routes.js";
 const app = express();
 
 const allowedOrigins = [
@@ -29,6 +29,7 @@ app.use(requestLogger);
 app.get("/", (req, res) => {
   res.send("Custom E-Commerce Backend API Running");
 });
+app.use("/api/products", productRoutes);
 
 app.get("/api/health", (req, res) => {
   res.json({ status: "Server running" });
