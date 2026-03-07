@@ -61,7 +61,7 @@ const Checkout = () => {
 };
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
+   <div className="max-w-7xl mx-auto px-6 py-12">
       
       <h1 className="text-3xl font-bold mb-8">
         Checkout
@@ -170,7 +170,7 @@ const Checkout = () => {
             <button
   type="button"
   onClick={handlePlaceOrder}
-  className="w-full bg-black text-white py-3 rounded hover:opacity-90"
+ className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:opacity-90 transition"
 >
   Place Order
 </button>
