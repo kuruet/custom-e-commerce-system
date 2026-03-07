@@ -1,5 +1,5 @@
+import { Textbox, Image } from "fabric";
 import ColorSelector from "./ColorSelector";
-import { Textbox } from "fabric";
 
 export default function DesignToolbar({ setColor, canvas }) {
 
@@ -16,7 +16,38 @@ export default function DesignToolbar({ setColor, canvas }) {
 
     canvas.add(text);
     canvas.setActiveObject(text);
+
   };
+
+const uploadLogo = async (event) => {
+
+  if (!canvas) return;
+
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = async (e) => {
+
+    const img = await Image.fromURL(e.target.result);
+
+    img.scaleToWidth(120);
+
+    img.set({
+      left: 160,
+      top: 160
+    });
+
+    canvas.add(img);
+    canvas.setActiveObject(img);
+    canvas.renderAll();
+
+  };
+
+  reader.readAsDataURL(file);
+
+};
 
   return (
     <div className="space-y-6">
@@ -30,9 +61,20 @@ export default function DesignToolbar({ setColor, canvas }) {
         Add Text
       </button>
 
-      <button className="w-full bg-gray-800 text-white py-2 rounded">
-        Upload Logo
-      </button>
+      <label className="w-full block">
+
+        <input
+          type="file"
+          accept="image/*"
+          onChange={uploadLogo}
+          className="hidden"
+        />
+
+        <div className="w-full bg-gray-800 text-white py-2 rounded text-center cursor-pointer">
+          Upload Logo
+        </div>
+
+      </label>
 
     </div>
   );
