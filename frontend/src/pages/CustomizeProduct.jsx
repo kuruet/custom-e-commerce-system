@@ -1,6 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import api from "../services/api";
+import DesignCanvas from "../components/DesignCanvas";
 
 export default function CustomizeProduct() {
   const { productId } = useParams();
@@ -12,7 +13,7 @@ export default function CustomizeProduct() {
     const fetchProduct = async () => {
       try {
         const response = await api.get(`/products/${productId}`);
-        setProduct(response.data);
+        setProduct(response.data.data);
       } catch (error) {
         console.error("Error fetching product:", error);
       } finally {
@@ -23,6 +24,7 @@ export default function CustomizeProduct() {
     fetchProduct();
   }, [productId]);
 
+  // Loading state
   if (loading) {
     return (
       <div className="p-10 text-center">
@@ -31,6 +33,7 @@ export default function CustomizeProduct() {
     );
   }
 
+  // Product not found
   if (!product) {
     return (
       <div className="p-10 text-center text-red-500">
@@ -48,7 +51,7 @@ export default function CustomizeProduct() {
 
       <div className="grid md:grid-cols-2 gap-10">
 
-        {/* Product Preview */}
+        {/* Product Info */}
         <div>
           <img
             src={product.image}
@@ -65,9 +68,9 @@ export default function CustomizeProduct() {
           </p>
         </div>
 
-        {/* Canvas area placeholder */}
-        <div className="border rounded-lg h-[400px] flex items-center justify-center">
-          Canvas will load here
+        {/* Canvas Designer */}
+        <div>
+          <DesignCanvas />
         </div>
 
       </div>
