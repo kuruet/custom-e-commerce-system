@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 import { getCartItems, clearCart } from "../utils/cartStorage";
 import CartItem from "../components/cart/CartItem";
+import { useNavigate } from "react-router-dom";
 
 export default function Cart() {
+
+    const navigate = useNavigate();
   const [cartItems, setCartItems] = useState([]);
 
   const refreshCart = () => {
@@ -58,6 +61,13 @@ export default function Cart() {
               Total: ₹{totalPrice}
             </div>
 
+            <button
+  onClick={() => navigate("/checkout")}
+  className="w-full bg-black text-white py-3 rounded mt-6 hover:opacity-90"
+>
+  Proceed to Checkout
+</button>
+
             <div className="flex gap-4">
 
               <button
@@ -70,11 +80,7 @@ export default function Cart() {
                 Clear Cart
               </button>
 
-              <button
-                className="bg-black text-white px-6 py-3 rounded-lg hover:opacity-90"
-              >
-                Proceed to Checkout
-              </button>
+              
 
             </div>
 

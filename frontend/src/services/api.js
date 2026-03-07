@@ -5,3 +5,12 @@ const API = axios.create({
 });
 
 export default API;
+
+export const createOrder = async (orderData) => {
+  const response = await axios.post(
+    `${import.meta.env.VITE_API_URL}/orders`,
+    orderData
+  );
+
+  return response.data;
+};
