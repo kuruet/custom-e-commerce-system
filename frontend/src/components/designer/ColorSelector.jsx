@@ -1,23 +1,37 @@
-export default function ColorSelector() {
+export default function ColorSelector({ setColor }) {
   return (
     <div>
-
-      <h3 className="font-semibold mb-2">
+      <h3 className="font-semibold mb-3">
         Choose Color
       </h3>
 
       <div className="flex gap-3">
 
-        <button className="w-8 h-8 rounded-full bg-white border"></button>
+        {/* White */}
+        <button
+          onClick={() => setColor("white")}
+          className="w-8 h-8 rounded-full bg-white border border-gray-300"
+        />
 
-        <button className="w-8 h-8 rounded-full bg-black"></button>
+        {/* Black */}
+        <button
+          onClick={() => setColor("black")}
+          className="w-8 h-8 rounded-full bg-black"
+        />
 
-        <button className="w-8 h-8 rounded-full bg-red-500"></button>
+        {/* Red */}
+        <button
+          onClick={() => setColor("red")}
+          className="w-8 h-8 rounded-full bg-red-500"
+        />
 
-        <button className="w-8 h-8 rounded-full bg-blue-500"></button>
+        {/* Blue */}
+        <button
+          onClick={() => setColor("blue")}
+          className="w-8 h-8 rounded-full bg-blue-500"
+        />
 
       </div>
-
     </div>
   );
 }
