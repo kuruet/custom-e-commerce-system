@@ -12,7 +12,7 @@ const OrderDetails = () => {
         `${import.meta.env.VITE_API_URL}/orders/${id}`
       );
 
-      setOrder(response.data.order || response.data);
+    setOrder(response.data.data);
     } catch (error) {
       console.error("Error fetching order:", error);
     }
@@ -55,30 +55,44 @@ const OrderDetails = () => {
 
         <h2 className="text-xl font-semibold mb-4">Items</h2>
 
-        {order.items.map((item, index) => (
+      {Array.isArray(order.items) && order.items.map((item, index) => (
 
-          <div key={index} className="mb-6 border-b pb-4">
+  <div
+    key={index}
+    className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 border p-4 rounded"
+  >
 
-            <p><strong>Product:</strong> {item.title}</p>
-            <p><strong>Color:</strong> {item.color}</p>
-            <p><strong>Quantity:</strong> {item.quantity}</p>
-            <p><strong>Price:</strong> ₹{item.price}</p>
+    {/* Product Info */}
 
-            <div className="mt-4">
+    <div>
 
-              <p className="font-semibold">Design Preview</p>
+      <h3 className="text-lg font-semibold mb-3">Product Information</h3>
 
-              <img
-                src={item.previewImage}
-                alt="design preview"
-                className="w-48 mt-2 border"
-              />
+      <p><strong>Title:</strong> {item.title}</p>
+      <p><strong>Color:</strong> {item.color}</p>
+      <p><strong>Quantity:</strong> {item.quantity}</p>
+      <p><strong>Price:</strong> ₹{item.price}</p>
 
-            </div>
+    </div>
 
-          </div>
 
-        ))}
+    {/* Design Preview */}
+
+    <div>
+
+      <h3 className="text-lg font-semibold mb-3">Design Preview</h3>
+
+      <img
+        src={item.previewImage}
+        alt="design preview"
+        className="w-64 border rounded"
+      />
+
+    </div>
+
+  </div>
+
+))}
 
       </div>
 

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+             import { Link } from "react-router-dom";
 
 const OrdersList = () => {
   const [orders, setOrders] = useState([]);
@@ -8,9 +9,11 @@ const OrdersList = () => {
     try {
       const response = await axios.get(
         `${import.meta.env.VITE_API_URL}/orders`
+        
       );
+      console.log(response.data);
 
-      setOrders(response.data.orders || response.data);
+     setOrders(response.data.data);
     } catch (error) {
       console.error("Error fetching orders:", error);
     }
@@ -35,24 +38,35 @@ const OrdersList = () => {
           </tr>
         </thead>
 
-        <tbody>
-          {Array.isArray(orders) && orders.map((order) => (
-            <tr key={order._id} className="text-center">
-              <td className="p-3 border">{order._id}</td>
-              <td className="p-3 border">{order.customer?.name}</td>
-              <td className="p-3 border">₹{order.totalPrice}</td>
-              <td className="p-3 border">{order.status}</td>
-              <td className="p-3 border">
-                <a
-                  href={`/admin/orders/${order._id}`}
-                  className="text-blue-500 underline"
-                >
-                  View
-                </a>
-              </td>
-            </tr>
-          ))}
-        </tbody>
+       <tbody>
+
+{Array.isArray(orders) && orders.length === 0 && (
+  <tr>
+    <td colSpan="5" className="p-4">
+      No orders found
+    </td>
+  </tr>
+)}
+
+{Array.isArray(orders) &&
+ orders.map((order) => (
+  <tr key={order._id} className="text-center">
+    <td className="p-3 border">{order._id}</td>
+    <td className="p-3 border">{order.customer?.name}</td>
+    <td className="p-3 border">₹{order.totalPrice}</td>
+    <td className="p-3 border">{order.status}</td>
+    <td className="p-3 border">
+      <Link
+        to={`/admin/orders/${order._id}`}
+        className="text-blue-600 underline font-semibold"
+      >
+        View
+      </Link>
+    </td>
+  </tr>
+))}
+
+</tbody>
       </table>
     </div>
   );
