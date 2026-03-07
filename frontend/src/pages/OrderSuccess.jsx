@@ -1,6 +1,10 @@
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 
 const OrderSuccess = () => {
+
+  const [searchParams] = useSearchParams();
+  const orderId = searchParams.get("orderId");
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-6">
 
@@ -14,28 +18,28 @@ const OrderSuccess = () => {
           Order Placed Successfully
         </h1>
 
-        <p className="text-gray-600 mb-6">
-          Thank you for your purchase. Your custom design has been received
-          and our team will begin processing your order shortly.
+        <p className="text-gray-600 mb-4">
+          Thank you for your purchase. Your custom product will be processed soon.
         </p>
 
-        <div className="space-y-3">
+        {orderId && (
+          <div className="bg-gray-100 rounded-lg p-3 mb-6">
+            <p className="text-sm text-gray-500">
+              Order ID
+            </p>
 
-          <Link
-            to="/"
-            className="block w-full bg-black text-white py-3 rounded-lg hover:opacity-90 transition"
-          >
-            Continue Shopping
-          </Link>
+            <p className="font-mono text-lg">
+              {orderId}
+            </p>
+          </div>
+        )}
 
-          <Link
-            to="/cart"
-            className="block w-full border border-gray-300 py-3 rounded-lg hover:bg-gray-100 transition"
-          >
-            View Cart
-          </Link>
-
-        </div>
+        <Link
+          to="/"
+          className="block w-full bg-black text-white py-3 rounded-lg hover:opacity-90 transition"
+        >
+          Continue Shopping
+        </Link>
 
       </div>
 

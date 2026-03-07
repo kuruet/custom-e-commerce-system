@@ -53,11 +53,13 @@ const handlePlaceOrder = async () => {
       totalPrice
     };
 
-    await createOrder(orderData);
+const response = await createOrder(orderData);
 
-    clearCart();
+const orderId = response.data._id;
 
-    navigate("/order-success");
+clearCart();
+
+navigate(`/order-success?orderId=${orderId}`);
 
   } catch (error) {
     console.error("Order creation failed:", error);
