@@ -14,30 +14,32 @@ export default function CustomizeProduct() {
   const [preview, setPreview] = useState(null);
 
   // Add To Cart Handler
-  const handleAddToCart = () => {
-    if (!canvasInstance) return;
+const handleAddToCart = () => {
+  if (!canvasInstance) return;
 
-    const previewImage = canvasInstance.toDataURL({
+  const previewImage =
+    preview ||
+    canvasInstance.toDataURL({
       format: "png",
       quality: 1,
     });
 
-    const designJSON = canvasInstance.toJSON();
+  const designJSON = canvasInstance.toJSON();
 
-    const cartItem = {
-      productId,
-      title: "custom product",
-      price: 0,
-      color,
-      quantity: 1,
-      previewImage,
-      designJSON,
-    };
-
-    addToCart(cartItem);
-
-    navigate("/cart");
+  const cartItem = {
+    productId,
+    title: "Custom Product",
+    price: 799, 
+    color,
+    quantity: 1,
+    previewImage,
+    designJSON,
   };
+
+  addToCart(cartItem);
+
+  navigate("/cart");
+};
 
   return (
     <div className="w-full p-6">
