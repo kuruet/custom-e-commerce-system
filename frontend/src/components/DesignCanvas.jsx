@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
-import { Canvas, Textbox } from "fabric";
+import { Canvas } from "fabric";
 
-export default function DesignCanvas() {
+export default function DesignCanvas({ setCanvas }) {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -9,23 +9,19 @@ export default function DesignCanvas() {
       width: 500,
       height: 500,
       backgroundColor: "#ffffff",
+      selection: true,
     });
 
-    // TEMP TEST OBJECT
-    const text = new Textbox("Edit me", {
-      left: 150,
-      top: 200,
-      fontSize: 30,
-      fill: "black"
-    });
+    setCanvas(canvas);
 
-    canvas.add(text);
-
-  }, []);
+    return () => {
+      canvas.dispose();
+    };
+  }, [setCanvas]);
 
   return (
     <div className="border-2 border-gray-300 rounded-lg p-4 bg-gray-100 flex justify-center items-center">
-      <canvas ref={canvasRef}/>
+      <canvas ref={canvasRef} />
     </div>
   );
 }
