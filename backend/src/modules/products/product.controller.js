@@ -5,17 +5,37 @@ import {
   updateProduct,
   deleteProduct
 } from "./product.service.js";
+import cloudinary from "../../config/cloudinary.js";
 
 
 // Create product
 export const createProductController = async (req, res, next) => {
   try {
-    const product = await createProduct(req.body);
+    let imageUrl = "";
+
+    if (req.file) {
+      const result = await cloudinary.uploader.upload(
+        `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`,
+        {
+          folder: "products"
+        }
+      );
+
+      imageUrl = result.secure_url;
+    }
+
+    const productData = {
+      ...req.body,
+      image: imageUrl
+    };
+
+    const product = await createProduct(productData);
 
     res.status(201).json({
       success: true,
       data: product
     });
+
   } catch (error) {
     next(error);
   }
