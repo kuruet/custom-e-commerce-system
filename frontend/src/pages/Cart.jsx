@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react";
-import { getCartItems } from "../utils/cartStorage";
+import { getCartItems, clearCart } from "../utils/cartStorage";
 import CartItem from "../components/cart/CartItem";
 
 export default function Cart() {
   const [cartItems, setCartItems] = useState([]);
 
+  const refreshCart = () => {
+    setCartItems(getCartItems());
+  };
+
   useEffect(() => {
-    const items = getCartItems();
-    setCartItems(items);
+    refreshCart();
   }, []);
 
   const totalPrice = cartItems.reduce((total, item) => {
@@ -15,37 +18,70 @@ export default function Cart() {
   }, 0);
 
   return (
-    <div className="w-full p-6">
+    <div className="w-full max-w-6xl mx-auto p-6">
 
-      <h1 className="text-3xl font-bold mb-8">
+      {/* Title */}
+      <h1 className="text-3xl font-bold mb-10">
         Your Cart
       </h1>
 
       {cartItems.length === 0 ? (
-        <p>Your cart is empty.</p>
+
+        <div className="text-center py-20 border rounded-lg">
+          <p className="text-gray-500 text-lg">
+            Your cart is empty
+          </p>
+        </div>
+
       ) : (
+
         <div className="space-y-6">
 
-         {cartItems.map((item, index) => (
-  <CartItem
-    key={index}
-    item={item}
-    index={index}
-    refreshCart={() => setCartItems(getCartItems())}
-  />
-))}
+          {/* Cart Items */}
+          <div className="space-y-4">
 
-          {/* Total */}
-          <div className="text-xl font-semibold">
-            Total: ₹{totalPrice}
+            {cartItems.map((item, index) => (
+              <CartItem
+                key={index}
+                item={item}
+                index={index}
+                refreshCart={refreshCart}
+              />
+            ))}
+
           </div>
 
-          {/* Checkout */}
-          <button className="bg-black text-white px-6 py-3 rounded">
-            Proceed to Checkout
-          </button>
+          {/* Cart Summary */}
+          <div className="flex justify-between items-center border-t pt-6 mt-10">
+
+            <div className="text-xl font-semibold">
+              Total: ₹{totalPrice}
+            </div>
+
+            <div className="flex gap-4">
+
+              <button
+                onClick={() => {
+                  clearCart();
+                  refreshCart();
+                }}
+                className="px-5 py-3 border rounded-lg hover:bg-gray-100"
+              >
+                Clear Cart
+              </button>
+
+              <button
+                className="bg-black text-white px-6 py-3 rounded-lg hover:opacity-90"
+              >
+                Proceed to Checkout
+              </button>
+
+            </div>
+
+          </div>
 
         </div>
+
       )}
 
     </div>
