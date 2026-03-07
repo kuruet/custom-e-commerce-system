@@ -1,4 +1,9 @@
+import { useNavigate } from "react-router-dom";
+
 const ProductCard = ({ product }) => {
+
+  const navigate = useNavigate();
+
   return (
     <div className="border rounded-lg shadow-md p-4">
 
@@ -16,7 +21,10 @@ const ProductCard = ({ product }) => {
         ₹{product.price}
       </p>
 
-      <button className="mt-3 bg-black text-white px-4 py-2 rounded">
+      <button
+        onClick={() => navigate(`/product/${product._id}`)}
+        className="mt-3 bg-black text-white px-4 py-2 rounded"
+      >
         View Product
       </button>
 
