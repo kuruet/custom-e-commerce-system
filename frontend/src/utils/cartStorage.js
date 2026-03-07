@@ -1,58 +1,34 @@
-// frontend/src/utils/cartStorage.js
-
 const CART_KEY = "cart";
 
-/*
-Get all cart items
-*/
 export const getCartItems = () => {
   const cart = localStorage.getItem(CART_KEY);
   return cart ? JSON.parse(cart) : [];
 };
 
-/*
-Save cart array
-*/
-const saveCart = (cartItems) => {
-  localStorage.setItem(CART_KEY, JSON.stringify(cartItems));
+const saveCart = (items) => {
+  localStorage.setItem(CART_KEY, JSON.stringify(items));
 };
 
-/*
-Add item to cart
-*/
 export const addToCart = (item) => {
   const cart = getCartItems();
   cart.push(item);
   saveCart(cart);
 };
 
-/*
-Remove item from cart
-*/
-export const removeFromCart = (productId) => {
+export const removeFromCart = (index) => {
   const cart = getCartItems();
-  const updatedCart = cart.filter((item) => item.productId !== productId);
-  saveCart(updatedCart);
+  cart.splice(index, 1);
+  saveCart(cart);
 };
 
-/*
-Clear entire cart
-*/
+export const updateQuantity = (index, quantity) => {
+  const cart = getCartItems();
+
+  cart[index].quantity = quantity;
+
+  saveCart(cart);
+};
+
 export const clearCart = () => {
   localStorage.removeItem(CART_KEY);
-};
-
-/*
-Update quantity
-*/
-export const updateQuantity = (productId, quantity) => {
-  const cart = getCartItems();
-
-  const updatedCart = cart.map((item) =>
-    item.productId === productId
-      ? { ...item, quantity }
-      : item
-  );
-
-  saveCart(updatedCart);
 };

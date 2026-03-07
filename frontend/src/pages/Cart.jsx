@@ -26,12 +26,14 @@ export default function Cart() {
       ) : (
         <div className="space-y-6">
 
-          {cartItems.map((item, index) => (
-            <CartItem
-              key={index}
-              item={item}
-            />
-          ))}
+         {cartItems.map((item, index) => (
+  <CartItem
+    key={index}
+    item={item}
+    index={index}
+    refreshCart={() => setCartItems(getCartItems())}
+  />
+))}
 
           {/* Total */}
           <div className="text-xl font-semibold">
