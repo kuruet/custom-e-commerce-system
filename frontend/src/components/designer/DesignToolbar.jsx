@@ -1,53 +1,81 @@
 import { Textbox, Image } from "fabric";
+import html2canvas from "html2canvas";
 import ColorSelector from "./ColorSelector";
 
-export default function DesignToolbar({ setColor, canvas }) {
+export default function DesignToolbar({ setColor, canvas, setPreview }) {
+
+  // PRINT AREA CENTER
+  const centerX = 210;
+  const centerY = 190;
 
   const addText = () => {
 
     if (!canvas) return;
 
     const text = new Textbox("Your Text", {
-      left: 180,
-      top: 180,
+      left: centerX,
+      top: centerY,
+      originX: "center",
+      originY: "center",
       fontSize: 24,
       fill: "black"
     });
 
     canvas.add(text);
     canvas.setActiveObject(text);
-
-  };
-
-const uploadLogo = async (event) => {
-
-  if (!canvas) return;
-
-  const file = event.target.files[0];
-  if (!file) return;
-
-  const reader = new FileReader();
-
-  reader.onload = async (e) => {
-
-    const img = await Image.fromURL(e.target.result);
-
-    img.scaleToWidth(120);
-
-    img.set({
-      left: 160,
-      top: 160
-    });
-
-    canvas.add(img);
-    canvas.setActiveObject(img);
     canvas.renderAll();
+  };
+
+
+  const uploadLogo = async (event) => {
+
+    if (!canvas) return;
+
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = async (e) => {
+
+      const img = await Image.fromURL(e.target.result);
+
+      img.scaleToWidth(100);
+
+      img.set({
+        left: centerX,
+        top: centerY,
+        originX: "center",
+        originY: "center"
+      });
+
+      canvas.add(img);
+      canvas.setActiveObject(img);
+      canvas.renderAll();
+
+    };
+
+    reader.readAsDataURL(file);
+
+    event.target.value = "";
+  };
+
+
+  const generatePreview = async () => {
+
+    const designer = document.getElementById("designer-area");
+    if (!designer) return;
+
+    const canvasImage = await html2canvas(designer);
+
+    const preview = canvasImage.toDataURL("image/png");
+
+    if (setPreview) {
+      setPreview(preview);
+    }
 
   };
 
-  reader.readAsDataURL(file);
-
-};
 
   return (
     <div className="space-y-6">
@@ -75,6 +103,13 @@ const uploadLogo = async (event) => {
         </div>
 
       </label>
+
+      <button
+        onClick={generatePreview}
+        className="w-full bg-green-600 text-white py-2 rounded"
+      >
+        Add To Cart
+      </button>
 
     </div>
   );

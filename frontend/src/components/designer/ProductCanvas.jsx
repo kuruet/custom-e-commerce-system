@@ -2,11 +2,21 @@ import { useEffect, useRef } from "react";
 import { Canvas } from "fabric";
 
 import shirtWhite from "../../assets/mockups/shirt-white.png";
+import shirtBlack from "../../assets/mockups/shirt-black.png";
+import shirtRed from "../../assets/mockups/shirt-red.png";
+import shirtBlue from "../../assets/mockups/shirt-blue.png";
 
 export default function ProductCanvas({ color, setCanvasInstance }) {
 
   const canvasRef = useRef(null);
   const fabricRef = useRef(null);
+
+  const mockups = {
+    white: shirtWhite,
+    black: shirtBlack,
+    red: shirtRed,
+    blue: shirtBlue
+  };
 
   useEffect(() => {
 
@@ -17,42 +27,58 @@ export default function ProductCanvas({ color, setCanvasInstance }) {
       selection: true
     });
 
-    const canvasWrapper = fabricRef.current.wrapperEl;
+    const wrapper = fabricRef.current.wrapperEl;
+    wrapper.style.position = "absolute";
+    wrapper.style.top = "0";
+    wrapper.style.left = "0";
 
-    canvasWrapper.style.position = "absolute";
-    canvasWrapper.style.top = "0";
-    canvasWrapper.style.left = "0";
+    if (setCanvasInstance) {
+      setCanvasInstance(fabricRef.current);
+    }
 
-    setCanvasInstance(fabricRef.current);
-
-    return () => {
-      fabricRef.current.dispose();
-    };
+    return () => fabricRef.current.dispose();
 
   }, []);
 
   return (
-    <div className="relative w-[420px] h-[420px]">
+    <div
+      id="designer-area"
+      style={{
+        width: "420px",
+        height: "420px",
+        position: "relative"
+      }}
+    >
 
+      {/* Shirt Layer */}
       <img
-        src={shirtWhite}
+        src={mockups[color]}
         alt="shirt"
-        className="absolute inset-0 w-full h-full object-contain select-none"
-      />
-
-      <div className="absolute inset-0">
-        <canvas ref={canvasRef}/>
-      </div>
-
-      <div
-        className="absolute border-2 border-dashed border-gray-400 pointer-events-none z-10"
         style={{
-          top: "120px",
-          left: "140px",
-          width: "140px",
-          height: "140px"
+          width: "420px",
+          height: "420px",
+          objectFit: "contain",
+          position: "absolute",
+          top: 0,
+          left: 0,
+          pointerEvents: "none"
         }}
       />
+
+      {/* Fabric Canvas */}
+      <canvas
+        ref={canvasRef}
+        width={420}
+        height={420}
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0
+        }}
+      />
+
+      {/* Print Area Guide */}
+     
 
     </div>
   );
