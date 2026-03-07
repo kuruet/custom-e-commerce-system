@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import API from "../services/api";
 import ProductCard from "../components/ProductCard";
+import ProductCatalog from '../components/layout/ProductCatalog';
 
 const Home = () => {
 
@@ -24,6 +25,9 @@ const Home = () => {
 
   return (
     <div className="max-w-6xl mx-auto p-6">
+
+  
+       
 
       <h1 className="text-3xl font-bold mb-6">
         Products
