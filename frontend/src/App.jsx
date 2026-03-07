@@ -5,6 +5,7 @@ import CustomizeProduct from "./pages/CustomizeProduct";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import OrderSuccess from "./pages/OrderSuccess";
+import OrdersList from "./pages/admin/OrdersList";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
       <Route path="/cart" element={<Cart />} />
       <Route path="/checkout" element={<Checkout />} />
       <Route path="/order-success" element={<OrderSuccess />} />
+      <Route path="/admin/orders" element={<OrdersList />} />
     </Routes>
   );
 }
