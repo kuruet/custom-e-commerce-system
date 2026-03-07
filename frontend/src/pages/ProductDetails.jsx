@@ -1,8 +1,10 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import API from "../services/api";
 
 const ProductDetails = () => {
+
+    const navigate = useNavigate();
 
   const { id } = useParams();
 
@@ -51,9 +53,12 @@ const ProductDetails = () => {
             ₹{product.price}
           </p>
 
-          <button className="bg-black text-white px-6 py-3 rounded">
-            Customize Product
-          </button>
+          <button
+  onClick={() => navigate(`/customize/${product._id}`)}
+  className="bg-black text-white px-6 py-2 rounded"
+>
+  Customize Product
+</button>
 
         </div>
 
