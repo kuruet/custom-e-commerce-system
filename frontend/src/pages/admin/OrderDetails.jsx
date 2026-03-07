@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import {  useRef } from "react";
+import { Canvas } from "fabric";
 import axios from "axios";
 
 const OrderDetails = () => {
   const { id } = useParams();
   const [order, setOrder] = useState(null);
+  const canvasRef = useRef(null);
 
   const fetchOrder = async () => {
     try {
@@ -21,6 +24,26 @@ const OrderDetails = () => {
   useEffect(() => {
     fetchOrder();
   }, []);
+
+  useEffect(() => {
+  if (!order) return;
+
+  if (!order.items || order.items.length === 0) return;
+
+  const designJSON = order.items[0].designJSON;
+
+  if (!designJSON) return;
+
+ const canvas = new Canvas(canvasRef.current, {
+  width: 400,
+  height: 400
+});
+
+  canvas.loadFromJSON(designJSON, () => {
+    canvas.renderAll();
+  });
+
+}, [order]);
 
   if (!order) {
     return <div className="p-6">Loading order...</div>;
@@ -89,6 +112,14 @@ const OrderDetails = () => {
       />
 
     </div>
+    <h3 className="text-lg font-semibold mt-6 mb-3">
+Design Canvas Viewer
+</h3>
+
+<canvas
+  ref={canvasRef}
+  className="border"
+/>
 
   </div>
 
