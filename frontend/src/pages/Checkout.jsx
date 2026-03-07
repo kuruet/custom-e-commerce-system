@@ -9,6 +9,7 @@ const Checkout = () => {
     const navigate = useNavigate();
 
   const [cartItems, setCartItems] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [form, setForm] = useState({
     name: "",
@@ -34,20 +35,22 @@ const Checkout = () => {
     return sum + item.price * item.quantity;
   }, 0);
 
-  const handlePlaceOrder = async () => {
+const handlePlaceOrder = async () => {
+  if (isSubmitting) return;
+
   try {
+    setIsSubmitting(true);
+
     const orderData = {
       customer: {
         name: form.name,
         phone: form.phone,
         address: form.address,
         city: form.city,
-        postalCode: form.postalCode,
+        postalCode: form.postalCode
       },
-
       items: cartItems,
-
-      totalPrice,
+      totalPrice
     };
 
     await createOrder(orderData);
@@ -55,8 +58,12 @@ const Checkout = () => {
     clearCart();
 
     navigate("/order-success");
+
   } catch (error) {
-    console.error("Order creation failed", error);
+    console.error("Order creation failed:", error);
+    alert("Failed to place order. Please try again.");
+  } finally {
+    setIsSubmitting(false);
   }
 };
 
@@ -167,12 +174,20 @@ const Checkout = () => {
               className="w-full border p-3 rounded"
             />
 
-            <button
+     <button
   type="button"
+  disabled={isSubmitting}
   onClick={handlePlaceOrder}
- className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:opacity-90 transition"
+  className="w-full bg-black text-white py-3 rounded-lg font-semibold transition disabled:opacity-50"
 >
-  Place Order
+  {isSubmitting ? (
+    <span className="flex items-center justify-center gap-2">
+      <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
+      Processing Order...
+    </span>
+  ) : (
+    "Place Order"
+  )}
 </button>
 
           </form>
