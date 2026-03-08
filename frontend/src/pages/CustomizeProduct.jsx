@@ -13,33 +13,33 @@ export default function CustomizeProduct() {
   const [canvasInstance, setCanvasInstance] = useState(null);
   const [preview, setPreview] = useState(null);
 
-  const handleAddToCart = () => {
-    if (!canvasInstance) return;
+const handleAddToCart = () => {
+  if (!canvasInstance) return;
 
-    const previewImage =
-      preview ||
-      canvasInstance.toDataURL({
-        format: "png",
-        quality: 1,
-      });
+  const previewImage =
+    preview ||
+    canvasInstance.toDataURL({
+      format: "jpeg",
+      quality: 0.6,
+    });
 
-    const designJSON = canvasInstance.toJSON();
+  const designJSON = canvasInstance.toJSON();
 
-    const cartItem = {
-      id: `custom-${Date.now()}`,
-      productId,
-      title: "Custom Product",
-      price: 799,
-      color,
-      quantity: 1,
-      previewImage,
-      designJSON,
-    };
-
-    addToCart(cartItem);
-
-    navigate("/shopping-cart");
+  const cartItem = {
+    id: `custom-${Date.now()}`,
+    productId,
+    title: "Custom Product",
+    price: 799,
+    color,
+    quantity: 1,
+    previewImage,
+    designJSON,
   };
+
+  addToCart(cartItem);
+
+  navigate("/shopping-cart");
+};
 
   return (
     <div className="w-full px-4 py-10 flex justify-center">
