@@ -10,6 +10,7 @@ const Signup = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [userExists, setUserExists] = useState(false);
 
   const [searchParams] = useSearchParams();
 const redirect = searchParams.get("redirect") || "/shopping-cart";
@@ -32,12 +33,16 @@ const handleSignup = async (e) => {
     navigate(redirect);
 
   } catch (error) {
+  const message = error.response?.data?.message || "Signup failed";
 
-    console.error("Signup failed:", error);
+  console.error("Signup failed:", message);
 
-    alert("Signup failed. Please try again.");
-
+  if (message === "User already exists") {
+    setUserExists(true);
+  } else {
+    alert(message);
   }
+}
 };
 
   return (
@@ -84,6 +89,22 @@ const handleSignup = async (e) => {
           >
             Create Account
           </button>
+
+          {userExists && (
+  <div className="mt-4 p-4 border border-yellow-300 bg-yellow-50 rounded-lg text-center">
+    <p className="text-sm text-gray-700 mb-2">
+      This email already has an account.
+    </p>
+
+    <button
+      type="button"
+      onClick={() => navigate("/login")}
+      className="text-black font-semibold underline"
+    >
+      Login Instead
+    </button>
+  </div>
+)}
 
         </form>
 
