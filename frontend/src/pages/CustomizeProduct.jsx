@@ -26,19 +26,20 @@ const handleAddToCart = () => {
 
   const designJSON = canvasInstance.toJSON();
 
-  const cartItem = {
-    productId,
-    title: "Custom Product",
-    price: 799, 
-    color,
-    quantity: 1,
-    previewImage,
-    designJSON,
-  };
+const cartItem = {
+  id: `custom-${Date.now()}`,   // unique cart id
+  productId,
+  title: "Custom Product",
+  price: 799,
+  color,
+  quantity: 1,
+  previewImage,
+  designJSON,
+};
 
   addToCart(cartItem);
 
-  navigate("/cart");
+  navigate("/shopping-cart")
 };
 
   return (

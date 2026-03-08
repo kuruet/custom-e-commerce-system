@@ -108,7 +108,7 @@ export default function DesignToolbar({ setColor, canvas, setPreview }) {
         onClick={generatePreview}
         className="w-full bg-green-600 text-white py-2 rounded"
       >
-        Add To Cart
+       Generate Preview
       </button>
 
     </div>
