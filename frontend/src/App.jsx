@@ -74,6 +74,14 @@ function App() {
               </AdminProtectedRoute>
             }
           />
+          <Route
+  path="/admin/orders/:id"
+  element={
+    <AdminProtectedRoute>
+      <OrderDetails />
+    </AdminProtectedRoute>
+  }
+/>
 
         </Route>
 
