@@ -4,6 +4,7 @@ import FeaturesSection from "../components/layout/FeaturesSection";
 import ProductCatalog from "../components/layout/ProductCatalog";
 import ReviewSection from "../components/layout/ReviewSection";
 import CustomProductSection from "../components/layout/CustomProductSection";
+import UpcomingPremiumRow from "../components/layout/UpcomingPremiumRow";
 
 const Home = () => {
   return (
@@ -13,6 +14,7 @@ const Home = () => {
       <FeaturesSection />
       <ProductCatalog />
       <CustomProductSection />
+      <UpcomingPremiumRow />
       <ReviewSection />
     </>
   );
