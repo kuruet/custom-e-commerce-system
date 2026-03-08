@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-
+import { Link, useLocation, useNavigate } from "react-router-dom";
 const NAV_ITEMS = [
   {
     label: "Dashboard",
@@ -53,6 +52,12 @@ const NAV_ITEMS = [
 export default function AdminSidebar() {
   const [open, setOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+
+const handleLogout = () => {
+  localStorage.removeItem("adminToken");
+  navigate("/admin/login");
+};
 
   const isActive = (path) =>
     path === "/admin"
@@ -117,6 +122,12 @@ export default function AdminSidebar() {
             <p className="text-slate-500 text-[11px] truncate">admin@nynth.studio</p>
           </div>
         </div>
+          <button
+    onClick={handleLogout}
+    className="w-full text-sm bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 px-3 py-2 rounded-lg transition"
+  >
+    Logout
+  </button>
       </div>
     </div>
   );

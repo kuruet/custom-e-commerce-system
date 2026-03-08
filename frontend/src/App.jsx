@@ -14,6 +14,8 @@ import OrdersList from "./pages/admin/OrdersList";
 import OrderDetails from "./pages/admin/OrderDetails";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 
+import AdminProtectedRoute from "./components/admin/AdminProtectedRoute";
+import AdminLogin from "./pages/admin/AdminLogin";
 
 function App() {
   return (
@@ -21,26 +23,37 @@ function App() {
 
       <Route element={<MainLayout />}>
 
+        {/* Public Routes */}
         <Route path="/" element={<Home />} />
-         <Route path="/shopping-cart" element={<Cart />} />
-
-    <Route path="/order-checkout" element={<Checkout />} />
-
-    <Route path="/success-page" element={<OrderSuccess />} />
+        <Route path="/shopping-cart" element={<Cart />} />
+        <Route path="/order-checkout" element={<Checkout />} />
+        <Route path="/success-page" element={<OrderSuccess />} />
 
         <Route path="/product/:id" element={<ProductDetails />} />
-
         <Route path="/customize/:productId" element={<CustomizeProduct />} />
 
+        {/* Admin Login */}
+        <Route path="/admin/login" element={<AdminLogin />} />
 
+        {/* Protected Admin Dashboard */}
+        <Route
+          path="/admin"
+          element={
+            <AdminProtectedRoute>
+              <AdminDashboard />
+            </AdminProtectedRoute>
+          }
+        />
 
-        {/* <Route path="/order-success" element={<OrderSuccess />} /> */}
-          <Route path="/admin" element={<AdminDashboard />} />
-
-
-        <Route path="/admin/orders" element={<OrdersList />} />
-
-        <Route path="/admin/orders/:id" element={<OrderDetails />} />
+        {/* Admin Orders */}
+        <Route
+          path="/admin/orders"
+          element={
+            <AdminProtectedRoute>
+              <OrdersList />
+            </AdminProtectedRoute>
+          }
+        />
 
       </Route>
 

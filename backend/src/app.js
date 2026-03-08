@@ -4,7 +4,7 @@ import requestLogger from "./middleware/requestLogger.js";
 import errorHandler from "./middleware/errorHandler.js";
 import productRoutes from "./modules/products/product.routes.js";
 import orderRoutes from "./modules/orders/order.routes.js";
-
+import adminRoutes from "./admin/routes/adminRoutes.js";
 
 const app = express();
 
@@ -43,6 +43,8 @@ app.use("/api/products", productRoutes);
 
 console.log("Registering order routes");
 app.use("/api/orders", orderRoutes);
+
+app.use("/api/admin", adminRoutes);
 
 app.get("/api/health", (req, res) => {
   res.json({ status: "Server running" });
