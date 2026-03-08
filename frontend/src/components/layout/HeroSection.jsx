@@ -28,7 +28,7 @@ const HeroSection = () => {
 
         {/* CTA button */}
         <Link
-          to="/customize"
+          to="/customize/tshirt-white"
           className="inline-block bg-black text-white px-8 py-4 rounded-md text-sm md:text-lg font-semibold tracking-[0.12em] hover:opacity-85 hover:scale-105 transition-all duration-300 ease-in-out"
         >
           CUSTOMIZE NOW
