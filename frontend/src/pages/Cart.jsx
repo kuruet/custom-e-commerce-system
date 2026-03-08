@@ -16,6 +16,17 @@ export default function Cart() {
     refreshCart();
   }, []);
 
+ const handleProceedToCheckout = () => {
+  const token = localStorage.getItem("userToken");
+
+  if (!token) {
+    navigate("/signup?redirect=/order-checkout");
+    return;
+  }
+
+  navigate("/order-checkout");
+};
+
   const totalPrice = cartItems.reduce((total, item) => {
     return total + item.price * item.quantity;
   }, 0);
@@ -62,8 +73,8 @@ export default function Cart() {
             </div>
 
             <button
-  onClick={() => navigate("/order-checkout")}
-  className="w-full bg-black text-white py-3 rounded mt-6 hover:opacity-90"
+  onClick={handleProceedToCheckout}
+  className="..."
 >
   Proceed to Checkout
 </button>

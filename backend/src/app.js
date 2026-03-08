@@ -2,9 +2,13 @@ import express from "express";
 import cors from "cors";
 import requestLogger from "./middleware/requestLogger.js";
 import errorHandler from "./middleware/errorHandler.js";
+
 import productRoutes from "./modules/products/product.routes.js";
 import orderRoutes from "./modules/orders/order.routes.js";
 import adminRoutes from "./admin/routes/adminRoutes.js";
+
+/* NEW: auth routes */
+import authRoutes from "./modules/auth/auth.routes.js";
 
 const app = express();
 
@@ -40,12 +44,20 @@ app.use(requestLogger);
 app.get("/", (req, res) => {
   res.send("Custom E-Commerce Backend API Running");
 });
+
+/* PRODUCT ROUTES */
 app.use("/api/products", productRoutes);
 
 console.log("Registering order routes");
+
+/* ORDER ROUTES */
 app.use("/api/orders", orderRoutes);
 
+/* ADMIN ROUTES */
 app.use("/api/admin", adminRoutes);
+
+/* NEW: AUTH ROUTES */
+app.use("/api/auth", authRoutes);
 
 app.get("/api/health", (req, res) => {
   res.json({ status: "Server running" });

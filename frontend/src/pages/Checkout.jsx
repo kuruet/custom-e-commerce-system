@@ -98,7 +98,13 @@ const [form, setForm] = useState({
         totalPrice,
       };
 
-      const response = await createOrder(orderData);
+     const token = localStorage.getItem("userToken");
+
+const response = await createOrder(orderData, {
+  headers: {
+    Authorization: `Bearer ${token}`
+  }
+});
 
       const orderId = response.data._id;
 

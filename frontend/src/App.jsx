@@ -16,7 +16,9 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 
 import AdminProtectedRoute from "./components/admin/AdminProtectedRoute";
 import AdminLogin from "./pages/admin/AdminLogin";
-
+import Signup from "./pages/Signup";
+import Login from "./pages/Login";
+import UserProtectedRoute from "./components/auth/UserProtectedRoute";
 function App() {
   return (
     <Routes>
@@ -26,8 +28,18 @@ function App() {
         {/* Public Routes */}
         <Route path="/" element={<Home />} />
         <Route path="/shopping-cart" element={<Cart />} />
-        <Route path="/order-checkout" element={<Checkout />} />
+        <Route
+  path="/order-checkout"
+  element={
+    <UserProtectedRoute>
+      <Checkout />
+    </UserProtectedRoute>
+  }
+/>
         <Route path="/success-page" element={<OrderSuccess />} />
+
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/login" element={<Login />} />
 
         <Route path="/product/:id" element={<ProductDetails />} />
         <Route path="/customize/:productId" element={<CustomizeProduct />} />
