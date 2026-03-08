@@ -11,7 +11,20 @@ const saveCart = (items) => {
 
 export const addToCart = (item) => {
   const cart = getCartItems();
-  cart.push(item);
+
+  const existingIndex = cart.findIndex(
+    (cartItem) => cartItem.id === item.id
+  );
+
+  if (existingIndex !== -1) {
+    cart[existingIndex].quantity += 1;
+  } else {
+    cart.push({
+      ...item,
+      quantity: 1,
+    });
+  }
+
   saveCart(cart);
 };
 
@@ -24,7 +37,11 @@ export const removeFromCart = (index) => {
 export const updateQuantity = (index, quantity) => {
   const cart = getCartItems();
 
-  cart[index].quantity = quantity;
+  if (quantity <= 0) {
+    cart.splice(index, 1);
+  } else {
+    cart[index].quantity = quantity;
+  }
 
   saveCart(cart);
 };

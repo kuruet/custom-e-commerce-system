@@ -10,12 +10,12 @@ const orderSchema = new mongoose.Schema(
       postalCode: String,
     },
 
-    items: [
-      {
-        productId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Product",
-        },
+   items: [
+  {
+    productId: {
+      type: String,
+      required: false
+    },
 
         title: String,
         price: Number,

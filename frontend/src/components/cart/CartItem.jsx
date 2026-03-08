@@ -18,13 +18,16 @@ export default function CartItem({ item, index, refreshCart }) {
     refreshCart();
   };
 
+  const imageSrc = item.previewImage || item.image || "/placeholder.png";
+  const productTitle = item.title || item.name || "Product";
+
   return (
     <div className="flex items-center gap-6 border rounded-lg p-5 shadow-sm hover:shadow-md transition">
 
       {/* Preview Image */}
       <img
-        src={item.previewImage}
-        alt="preview"
+        src={imageSrc}
+        alt={productTitle}
         className="w-[120px] h-[120px] object-contain border rounded"
       />
 
@@ -32,12 +35,15 @@ export default function CartItem({ item, index, refreshCart }) {
       <div className="flex-1">
 
         <h2 className="font-semibold text-lg">
-          {item.title}
+          {productTitle}
         </h2>
 
-        <p className="text-sm text-gray-500 mt-1">
-          Color: {item.color}
-        </p>
+        {/* Color only if exists */}
+        {item.color && (
+          <p className="text-sm text-gray-500 mt-1">
+            Color: {item.color}
+          </p>
+        )}
 
         <p className="font-medium mt-2">
           ₹{item.price}
@@ -48,6 +54,7 @@ export default function CartItem({ item, index, refreshCart }) {
 
           <button
             onClick={decreaseQty}
+            aria-label="Decrease quantity"
             className="w-8 h-8 border rounded hover:bg-gray-100"
           >
             -
@@ -59,6 +66,7 @@ export default function CartItem({ item, index, refreshCart }) {
 
           <button
             onClick={increaseQty}
+            aria-label="Increase quantity"
             className="w-8 h-8 border rounded hover:bg-gray-100"
           >
             +

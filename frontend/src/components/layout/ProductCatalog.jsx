@@ -137,7 +137,12 @@ const ProductCard = ({ product, index, onAddToCart }) => {
   const [added, setAdded] = useState(false);
 
   const handleClick = () => {
-    addToCart({ ...product, quantity: 1 });
+    addToCart({
+  id: product.id,
+  title: product.name,
+  price: product.price,
+  previewImage: product.image,
+});
     onAddToCart();           // notify parent to show sticky bar
     setAdded(true);
     setTimeout(() => setAdded(false), 1200);
@@ -208,7 +213,7 @@ const StickyCartBar = ({ visible, itemCount }) => {
     >
       <div className="max-w-lg mx-auto">
         <button
-          onClick={() => navigate("/cart")}
+          onClick={() => navigate("/shopping-cart")}
           className="w-full flex items-center justify-between bg-black text-white font-semibold rounded-xl py-4 px-6 hover:bg-zinc-800 active:scale-[0.98] transition-all duration-200 shadow-[0_8px_32px_rgba(0,0,0,0.25)]"
         >
           <span className="text-sm tracking-wide">

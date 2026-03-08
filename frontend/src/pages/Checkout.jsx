@@ -29,6 +29,17 @@ const Checkout = () => {
     });
   };
 
+  useEffect(() => {
+  const items = getCartItems();
+
+  if (items.length === 0) {
+    navigate("/shopping-cart");
+  }
+
+  setCartItems(items);
+}, []);
+
+
   const totalPrice = cartItems.reduce((sum, item) => {
     return sum + item.price * item.quantity;
   }, 0);
@@ -55,14 +66,12 @@ const Checkout = () => {
         },
 
         items: cartItems.map((item) => ({
-          productId: item.productId || item._id,
-          title: item.title,
-          price: item.price,
-          color: item.color,
-          quantity: item.quantity,
-          previewImage: item.previewImage,
-          designJSON: item.designJSON,
-        })),
+productId: String(item.id),
+  title: item.title,
+  price: item.price,
+  quantity: item.quantity,
+  previewImage: item.previewImage,
+})),
 
         totalPrice,
       };
@@ -73,7 +82,7 @@ const Checkout = () => {
 
       clearCart();
 
-      navigate(`/order-success?orderId=${orderId}`);
+     navigate(`/success-page?orderId=${orderId}`);
     } catch (error) {
       console.error("Order creation failed:", error);
       alert("Failed to place order. Please try again.");
