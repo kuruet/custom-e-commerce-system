@@ -1,14 +1,23 @@
 import { useState } from "react";
 import { Search, User, ShoppingBag, Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const navLinks = [
+
+  
   { label: "CUSTOMIZE", href: "/customize" },
   { label: "CORPORATE", href: "/corporate" },
   { label: "GIFTING", href: "/gifting" },
 ];
 
 const Header = ({ cartItemCount = 0 }) => {
+
+  
+
+    const navigate = useNavigate();
+
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
@@ -18,6 +27,10 @@ const Header = ({ cartItemCount = 0 }) => {
     setMobileSearchOpen(false);
   };
 
+  const handleLogout = () => {
+  localStorage.removeItem("userToken");
+  navigate("/");
+};
   return (
     <>
       {/* ── Header bar ── */}
@@ -99,17 +112,12 @@ const Header = ({ cartItemCount = 0 }) => {
             </button>
 
             {/* Cart */}
-            <button
-              aria-label={cartItemCount > 0 ? `Shopping cart — ${cartItemCount} items` : "Shopping cart"}
-              className="relative text-zinc-400 hover:text-white transition-colors duration-200 hover:scale-105 p-1"
-            >
-              <ShoppingBag size={20} />
-              {cartItemCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-semibold leading-none bg-red-500 text-white rounded-full">
-                  {cartItemCount > 99 ? "99+" : cartItemCount}
-                </span>
-              )}
-            </button>
+          <button
+  onClick={handleLogout}
+  className="text-red-700 text-lg font-semibold hover:text-red-700 transition"
+>
+  Logout
+</button>
           </div>
         </div>
       </header>

@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Search, User, ShoppingBag, Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 
 const navLinks = [
@@ -12,6 +13,11 @@ const navLinks = [
 const Header = ({ cartItemCount = 0 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+
+  const handleLogout = () => {
+  localStorage.removeItem("userToken");
+  navigate("/");
+};
 
   return (
     <header className="sticky top-0 z-50 h-[72px] bg-header border-b border-header-border backdrop-blur-md">
@@ -70,12 +76,12 @@ const Header = ({ cartItemCount = 0 }) => {
           </div>
 
           {/* Profile */}
-          <button
-            aria-label="Profile"
-            className="text-header-muted hover:text-header-foreground transition-colors duration-200 hover:scale-105"
-          >
-            <User size={20} />
-          </button>
+        <button
+  onClick={handleLogout}
+  className="text-sm font-medium hover:underline"
+>
+  Logout
+</button>
 
           {/* Cart */}
           <button

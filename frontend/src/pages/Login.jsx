@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import API from "../services/api";
 
-const Login = () => {
+const Login = ({ modalMode = false, onSuccess }) => {
 
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -26,25 +26,33 @@ const Login = () => {
 
       localStorage.setItem("userToken", token);
 
+      /* Modal mode */
+      if (modalMode) {
+        if (onSuccess) onSuccess();
+        return;
+      }
+
+      /* Normal page mode */
       navigate(redirect);
 
     } catch (error) {
 
       console.error("Login failed:", error);
-
       alert("Invalid email or password");
 
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-6">
+    <div className={modalMode ? "" : "min-h-screen flex items-center justify-center bg-gray-50 px-6"}>
 
-      <div className="bg-white shadow-lg rounded-2xl p-10 max-w-md w-full">
+      <div className={modalMode ? "" : "bg-white shadow-lg rounded-2xl p-10 max-w-md w-full"}>
 
-        <h1 className="text-2xl font-bold mb-6 text-center">
-          Login to Your Account
-        </h1>
+        {!modalMode && (
+          <h1 className="text-2xl font-bold mb-6 text-center">
+            Login to Your Account
+          </h1>
+        )}
 
         <form onSubmit={handleLogin} className="space-y-4">
 
@@ -75,12 +83,14 @@ const Login = () => {
 
         </form>
 
-        <p className="text-sm text-center text-gray-600 mt-4">
-          Don't have an account?{" "}
-          <Link to="/signup" className="text-black font-medium underline">
-            Create one
-          </Link>
-        </p>
+        {!modalMode && (
+          <p className="text-sm text-center text-gray-600 mt-4">
+            Don't have an account?{" "}
+            <Link to="/signup" className="text-black font-medium underline">
+              Create one
+            </Link>
+          </p>
+        )}
 
       </div>
 

@@ -2,11 +2,17 @@ import { useEffect, useState } from "react";
 import { getCartItems, clearCart } from "../utils/cartStorage";
 import CartItem from "../components/cart/CartItem";
 import { useNavigate } from "react-router-dom";
+import AuthModal from "../components/auth/AuthModal";
 
 export default function Cart() {
 
     const navigate = useNavigate();
   const [cartItems, setCartItems] = useState([]);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const handleAuthSuccess = () => {
+  setShowAuthModal(false);
+  navigate("/order-checkout");
+};
 
   const refreshCart = () => {
     setCartItems(getCartItems());
@@ -20,7 +26,7 @@ export default function Cart() {
   const token = localStorage.getItem("userToken");
 
   if (!token) {
-    navigate("/signup?redirect=/order-checkout");
+  setShowAuthModal(true);
     return;
   }
 
@@ -101,6 +107,14 @@ export default function Cart() {
 
       )}
 
+    <AuthModal
+  isOpen={showAuthModal}
+  onClose={() => setShowAuthModal(false)}
+  onSuccess={handleAuthSuccess}
+/>
+
     </div>
+
+    
   );
 }

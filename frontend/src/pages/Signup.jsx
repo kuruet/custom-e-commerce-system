@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { useNavigate , useSearchParams} from "react-router-dom";
-
 import API from "../services/api";
 
-const Signup = () => {
+const Signup = ({ modalMode = false, onSuccess }) => {
 
   const navigate = useNavigate();
 
@@ -13,46 +12,56 @@ const Signup = () => {
   const [userExists, setUserExists] = useState(false);
 
   const [searchParams] = useSearchParams();
-const redirect = searchParams.get("redirect") || "/shopping-cart";
+  const redirect = searchParams.get("redirect") || "/shopping-cart";
 
-const handleSignup = async (e) => {
-  e.preventDefault();
+  const handleSignup = async (e) => {
+    e.preventDefault();
 
-  try {
+    try {
 
-    const res = await API.post("/auth/signup", {
-      name,
-      email,
-      password
-    });
+      const res = await API.post("/auth/signup", {
+        name,
+        email,
+        password
+      });
 
-    const token = res.data.token;
+      const token = res.data.token;
 
-    localStorage.setItem("userToken", token);
+      localStorage.setItem("userToken", token);
 
-    navigate(redirect);
+      /* Modal mode */
+      if (modalMode) {
+        if (onSuccess) onSuccess();
+        return;
+      }
 
-  } catch (error) {
-  const message = error.response?.data?.message || "Signup failed";
+      /* Normal page mode */
+      navigate(redirect);
 
-  console.error("Signup failed:", message);
+    } catch (error) {
 
-  if (message === "User already exists") {
-    setUserExists(true);
-  } else {
-    alert(message);
-  }
-}
-};
+      const message = error.response?.data?.message || "Signup failed";
+
+      console.error("Signup failed:", message);
+
+      if (message === "User already exists") {
+        setUserExists(true);
+      } else {
+        alert(message);
+      }
+    }
+  };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-6">
+    <div className={modalMode ? "" : "min-h-screen flex items-center justify-center bg-gray-50 px-6"}>
 
-      <div className="bg-white shadow-lg rounded-2xl p-10 max-w-md w-full">
+      <div className={modalMode ? "" : "bg-white shadow-lg rounded-2xl p-10 max-w-md w-full"}>
 
-        <h1 className="text-2xl font-bold mb-6 text-center">
-          Create Your Account
-        </h1>
+        {!modalMode && (
+          <h1 className="text-2xl font-bold mb-6 text-center">
+            Create Your Account
+          </h1>
+        )}
 
         <form onSubmit={handleSignup} className="space-y-4">
 
@@ -91,20 +100,20 @@ const handleSignup = async (e) => {
           </button>
 
           {userExists && (
-  <div className="mt-4 p-4 border border-yellow-300 bg-yellow-50 rounded-lg text-center">
-    <p className="text-sm text-gray-700 mb-2">
-      This email already has an account.
-    </p>
+            <div className="mt-4 p-4 border border-yellow-300 bg-yellow-50 rounded-lg text-center">
+              <p className="text-sm text-gray-700 mb-2">
+                This email already has an account.
+              </p>
 
-    <button
-      type="button"
-      onClick={() => navigate("/login")}
-      className="text-black font-semibold underline"
-    >
-      Login Instead
-    </button>
-  </div>
-)}
+              <button
+                type="button"
+                onClick={() => navigate("/login")}
+                className="text-black font-semibold underline"
+              >
+                Login Instead
+              </button>
+            </div>
+          )}
 
         </form>
 
