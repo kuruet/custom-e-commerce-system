@@ -19,57 +19,66 @@ import AdminLogin from "./pages/admin/AdminLogin";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import UserProtectedRoute from "./components/auth/UserProtectedRoute";
+import ScrollToTop from "./components/common/ScrollToTop";
+
 function App() {
   return (
-    <Routes>
+    <>
+      {/* Scroll fix for route changes */}
+      <ScrollToTop />
 
-      <Route element={<MainLayout />}>
+      <Routes>
 
-        {/* Public Routes */}
-        <Route path="/" element={<Home />} />
-        <Route path="/shopping-cart" element={<Cart />} />
-        <Route
-  path="/order-checkout"
-  element={
-    <UserProtectedRoute>
-      <Checkout />
-    </UserProtectedRoute>
-  }
-/>
-        <Route path="/success-page" element={<OrderSuccess />} />
+        <Route element={<MainLayout />}>
 
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/login" element={<Login />} />
+          {/* Public Routes */}
+          <Route path="/" element={<Home />} />
+          <Route path="/shopping-cart" element={<Cart />} />
 
-        <Route path="/product/:id" element={<ProductDetails />} />
-        <Route path="/customize/:productId" element={<CustomizeProduct />} />
+          <Route
+            path="/order-checkout"
+            element={
+              <UserProtectedRoute>
+                <Checkout />
+              </UserProtectedRoute>
+            }
+          />
 
-        {/* Admin Login */}
-        <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/success-page" element={<OrderSuccess />} />
 
-        {/* Protected Admin Dashboard */}
-        <Route
-          path="/admin"
-          element={
-            <AdminProtectedRoute>
-              <AdminDashboard />
-            </AdminProtectedRoute>
-          }
-        />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/login" element={<Login />} />
 
-        {/* Admin Orders */}
-        <Route
-          path="/admin/orders"
-          element={
-            <AdminProtectedRoute>
-              <OrdersList />
-            </AdminProtectedRoute>
-          }
-        />
+          <Route path="/product/:id" element={<ProductDetails />} />
+          <Route path="/customize/:productId" element={<CustomizeProduct />} />
 
-      </Route>
+          {/* Admin Login */}
+          <Route path="/admin/login" element={<AdminLogin />} />
 
-    </Routes>
+          {/* Admin Dashboard */}
+          <Route
+            path="/admin"
+            element={
+              <AdminProtectedRoute>
+                <AdminDashboard />
+              </AdminProtectedRoute>
+            }
+          />
+
+          {/* Admin Orders */}
+          <Route
+            path="/admin/orders"
+            element={
+              <AdminProtectedRoute>
+                <OrdersList />
+              </AdminProtectedRoute>
+            }
+          />
+
+        </Route>
+
+      </Routes>
+    </>
   );
 }
 

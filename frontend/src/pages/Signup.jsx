@@ -10,12 +10,17 @@ const Signup = ({ modalMode = false, onSuccess }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [userExists, setUserExists] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const [searchParams] = useSearchParams();
   const redirect = searchParams.get("redirect") || "/shopping-cart";
 
-  const handleSignup = async (e) => {
-    e.preventDefault();
+const handleSignup = async (e) => {
+  e.preventDefault();
+
+  if (loading) return;
+
+  setLoading(true);
 
     try {
 
@@ -38,18 +43,21 @@ const Signup = ({ modalMode = false, onSuccess }) => {
       /* Normal page mode */
       navigate(redirect);
 
-    } catch (error) {
+   } catch (error) {
 
-      const message = error.response?.data?.message || "Signup failed";
+  const message = error.response?.data?.message || "Signup failed";
 
-      console.error("Signup failed:", message);
+  console.error("Signup failed:", message);
 
-      if (message === "User already exists") {
-        setUserExists(true);
-      } else {
-        alert(message);
-      }
-    }
+  if (message === "User already exists") {
+    setUserExists(true);
+  } else {
+    alert(message);
+  }
+
+} finally {
+  setLoading(false);
+}
   };
 
   return (
@@ -92,12 +100,20 @@ const Signup = ({ modalMode = false, onSuccess }) => {
             className="w-full border rounded-lg px-4 py-3"
           />
 
-          <button
-            type="submit"
-            className="w-full bg-black text-white py-3 rounded-lg hover:opacity-90 transition"
-          >
-            Create Account
-          </button>
+        <button
+  type="submit"
+  disabled={loading}
+  className="w-full bg-black text-white py-3 rounded-lg hover:opacity-90 transition flex items-center justify-center gap-2 disabled:opacity-60"
+>
+  {loading ? (
+    <>
+      <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+      Creating account...
+    </>
+  ) : (
+    "Create Account"
+  )}
+</button>
 
           {userExists && (
             <div className="mt-4 p-4 border border-yellow-300 bg-yellow-50 rounded-lg text-center">

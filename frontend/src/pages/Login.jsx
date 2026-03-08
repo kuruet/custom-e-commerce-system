@@ -11,9 +11,14 @@ const Login = ({ modalMode = false, onSuccess }) => {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
+const handleLogin = async (e) => {
+  e.preventDefault();
+
+  if (loading) return;
+
+  setLoading(true);
 
     try {
 
@@ -35,12 +40,14 @@ const Login = ({ modalMode = false, onSuccess }) => {
       /* Normal page mode */
       navigate(redirect);
 
-    } catch (error) {
+  } catch (error) {
 
-      console.error("Login failed:", error);
-      alert("Invalid email or password");
+  console.error("Login failed:", error);
+  alert("Invalid email or password");
 
-    }
+} finally {
+  setLoading(false);
+}
   };
 
   return (
@@ -74,12 +81,20 @@ const Login = ({ modalMode = false, onSuccess }) => {
             className="w-full border rounded-lg px-4 py-3"
           />
 
-          <button
-            type="submit"
-            className="w-full bg-black text-white py-3 rounded-lg hover:opacity-90 transition"
-          >
-            Login
-          </button>
+        <button
+  type="submit"
+  disabled={loading}
+  className="w-full bg-black text-white py-3 rounded-lg hover:opacity-90 transition flex items-center justify-center gap-2 disabled:opacity-60"
+>
+  {loading ? (
+    <>
+      <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+      Signing in...
+    </>
+  ) : (
+    "Login"
+  )}
+</button>
 
         </form>
 
