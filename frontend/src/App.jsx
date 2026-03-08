@@ -12,6 +12,8 @@ import OrderSuccess from "./pages/OrderSuccess";
 
 import OrdersList from "./pages/admin/OrdersList";
 import OrderDetails from "./pages/admin/OrderDetails";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+
 
 function App() {
   return (
@@ -33,6 +35,8 @@ function App() {
 
 
         {/* <Route path="/order-success" element={<OrderSuccess />} /> */}
+          <Route path="/admin" element={<AdminDashboard />} />
+
 
         <Route path="/admin/orders" element={<OrdersList />} />
 
