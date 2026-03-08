@@ -31,6 +31,11 @@ const orderSchema = new mongoose.Schema(
 
     totalPrice: Number,
 
+    paymentMethod: {
+  type: String,
+  default: "COD"
+},
+
     status: {
       type: String,
       default: "pending",

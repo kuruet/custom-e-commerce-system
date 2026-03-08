@@ -12,36 +12,38 @@ const saveCart = (items) => {
 export const addToCart = (item) => {
   const cart = getCartItems();
 
-  const existingIndex = cart.findIndex(
-    (cartItem) => cartItem.id === item.id
-  );
+  const existingIndex = cart.findIndex((c) => c.id === item.id);
 
   if (existingIndex !== -1) {
-    cart[existingIndex].quantity += 1;
+    cart[existingIndex].quantity += item.quantity || 1;
   } else {
     cart.push({
       ...item,
-      quantity: 1,
+      quantity: item.quantity || 1,
     });
   }
 
   saveCart(cart);
 };
 
-export const removeFromCart = (index) => {
-  const cart = getCartItems();
-  cart.splice(index, 1);
+export const removeFromCart = (id) => {
+  const cart = getCartItems().filter((item) => item.id !== id);
   saveCart(cart);
 };
 
-export const updateQuantity = (index, quantity) => {
+export const updateQuantity = (id, quantity) => {
   const cart = getCartItems();
 
+  const item = cart.find((c) => c.id === id);
+
+  if (!item) return;
+
   if (quantity <= 0) {
-    cart.splice(index, 1);
-  } else {
-    cart[index].quantity = quantity;
+    removeFromCart(id);
+    return;
   }
+
+  item.quantity = quantity;
 
   saveCart(cart);
 };

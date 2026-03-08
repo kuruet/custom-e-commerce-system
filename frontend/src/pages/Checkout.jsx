@@ -8,17 +8,25 @@ const Checkout = () => {
 
   const [cartItems, setCartItems] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState({});
 
-  const [form, setForm] = useState({
-    name: "",
-    phone: "",
-    address: "",
-    city: "",
-    postalCode: "",
-  });
+const [form, setForm] = useState({
+  name: "",
+  phone: "",
+  address: "",
+  city: "",
+  postalCode: "",
+  paymentMethod: "COD",
+});
 
   useEffect(() => {
     const items = getCartItems();
+
+    if (items.length === 0) {
+      navigate("/shopping-cart");
+      return;
+    }
+
     setCartItems(items);
   }, []);
 
@@ -29,35 +37,49 @@ const Checkout = () => {
     });
   };
 
-  useEffect(() => {
-  const items = getCartItems();
+  const validateForm = () => {
+    const newErrors = {};
 
-  if (items.length === 0) {
-    navigate("/shopping-cart");
-  }
+    if (!form.name.trim()) {
+      newErrors.name = "Name is required";
+    }
 
-  setCartItems(items);
-}, []);
+    if (!/^[0-9]{10}$/.test(form.phone)) {
+      newErrors.phone = "Phone must be 10 digits";
+    }
 
+    if (!form.address.trim()) {
+      newErrors.address = "Address is required";
+    }
+
+    if (!form.city.trim()) {
+      newErrors.city = "City is required";
+    }
+
+    if (!/^[0-9]{6}$/.test(form.postalCode)) {
+      newErrors.postalCode = "Pincode must be 6 digits";
+    }
+
+    setErrors(newErrors);
+
+    return Object.keys(newErrors).length === 0;
+  };
 
   const totalPrice = cartItems.reduce((sum, item) => {
-    return sum + item.price * item.quantity;
+    return sum + item.price * (item.quantity || 1);
   }, 0);
 
   const handlePlaceOrder = async () => {
     if (isSubmitting) return;
-
-    // Frontend validation (prevents empty submission)
-    if (!form.name || !form.phone || !form.address) {
-      alert("Please fill in all required shipping fields.");
-      return;
-    }
+    if (!validateForm()) return;
 
     try {
       setIsSubmitting(true);
 
       const orderData = {
-        customer: {
+  paymentMethod: form.paymentMethod,
+
+  customer: {
           name: form.name,
           phone: form.phone,
           address: form.address,
@@ -66,12 +88,12 @@ const Checkout = () => {
         },
 
         items: cartItems.map((item) => ({
-productId: String(item.id),
-  title: item.title,
-  price: item.price,
-  quantity: item.quantity,
-  previewImage: item.previewImage,
-})),
+          productId: String(item.id),
+          title: item.title,
+          price: item.price,
+          quantity: item.quantity,
+          previewImage: item.previewImage,
+        })),
 
         totalPrice,
       };
@@ -82,7 +104,7 @@ productId: String(item.id),
 
       clearCart();
 
-     navigate(`/success-page?orderId=${orderId}`);
+      navigate(`/success-page?orderId=${orderId}`);
     } catch (error) {
       console.error("Order creation failed:", error);
       alert("Failed to place order. Please try again.");
@@ -124,10 +146,6 @@ productId: String(item.id),
                     {item.title}
                   </h3>
 
-                  <p className="text-sm text-gray-500">
-                    Color: {item.color}
-                  </p>
-
                   <p className="text-sm">
                     Qty: {item.quantity}
                   </p>
@@ -163,49 +181,119 @@ productId: String(item.id),
             }}
           >
 
-            <input
-              type="text"
-              name="name"
-              placeholder="Full Name"
-              value={form.name}
-              onChange={handleChange}
-              className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-            />
+            {/* Name */}
+            <div>
+              <input
+                type="text"
+                name="name"
+                placeholder="Full Name"
+                value={form.name}
+                onChange={handleChange}
+                className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+              />
+              {errors.name && (
+                <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+              )}
+            </div>
 
-            <input
-              type="text"
-              name="phone"
-              placeholder="Phone Number"
-              value={form.phone}
-              onChange={handleChange}
-              className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-            />
+            {/* Phone */}
+            <div>
+              <input
+                type="text"
+                name="phone"
+                placeholder="Phone Number"
+                value={form.phone}
+                onChange={handleChange}
+                className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+              />
+              {errors.phone && (
+                <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
+              )}
+            </div>
 
-            <textarea
-              name="address"
-              placeholder="Address"
-              value={form.address}
-              onChange={handleChange}
-              className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-            />
+            {/* Address */}
+            <div>
+              <textarea
+                name="address"
+                placeholder="Address"
+                value={form.address}
+                onChange={handleChange}
+                className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+              />
+              {errors.address && (
+                <p className="text-red-500 text-sm mt-1">{errors.address}</p>
+              )}
+            </div>
 
-            <input
-              type="text"
-              name="city"
-              placeholder="City"
-              value={form.city}
-              onChange={handleChange}
-              className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-            />
+            {/* City */}
+            <div>
+              <input
+                type="text"
+                name="city"
+                placeholder="City"
+                value={form.city}
+                onChange={handleChange}
+                className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+              />
+              {errors.city && (
+                <p className="text-red-500 text-sm mt-1">{errors.city}</p>
+              )}
+            </div>
 
-            <input
-              type="text"
-              name="postalCode"
-              placeholder="Postal Code"
-              value={form.postalCode}
-              onChange={handleChange}
-              className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
-            />
+            {/* Pincode */}
+            <div>
+              <input
+                type="text"
+                name="postalCode"
+                placeholder="Postal Code"
+                value={form.postalCode}
+                onChange={handleChange}
+                className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-black"
+              />
+              {errors.postalCode && (
+                <p className="text-red-500 text-sm mt-1">{errors.postalCode}</p>
+              )}
+            </div>
+
+            {/* Payment Method */}
+<div className="mt-4">
+
+  <h3 className="text-lg font-semibold mb-3">
+    Payment Method
+  </h3>
+
+  <div className="border border-gray-300 rounded-lg p-4 flex items-center justify-between bg-gray-50">
+
+    <div className="flex items-center gap-3">
+
+      <input
+        type="radio"
+        name="paymentMethod"
+        value="COD"
+        checked={form.paymentMethod === "COD"}
+        onChange={handleChange}
+        className="accent-black"
+      />
+
+      <div>
+        <p className="font-medium">
+          Cash on Delivery
+        </p>
+
+        <p className="text-sm text-gray-500">
+          Pay with cash when your order arrives
+        </p>
+      </div>
+
+    </div>
+
+    <span className="text-green-600 font-semibold text-sm">
+      Available
+    </span>
+
+  </div>
+
+</div>
 
             <button
               type="submit"
