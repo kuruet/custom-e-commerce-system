@@ -15,7 +15,7 @@ export const getAdminAnalytics = async (req, res) => {
 
     res.status(500).json({
       success: false,
-      message: "Failed to fetch analytics"
+      message: "Failed to fetch analytics"   
     });
 
   }
