@@ -8,5 +8,5 @@ export default function AdminProtectedRoute({ children }) {
     return <Navigate to="/admin/login" replace />;
   }
 
-  return children;
+  return children;    
 }
