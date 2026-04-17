@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { getCartItems, clearCart } from "../utils/cartStorage";
 import { useNavigate } from "react-router-dom";
-import { createOrder } from "../services/api";
+import { createOrder, getRecommendations } from "../services/api";
+import ProductCard from "../components/ProductCard";
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -9,6 +10,7 @@ const Checkout = () => {
   const [cartItems, setCartItems] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
+  const [recommendations, setRecommendations] = useState([]);
 
 const [form, setForm] = useState({
   name: "",
@@ -28,6 +30,20 @@ const [form, setForm] = useState({
     }
 
     setCartItems(items);
+
+    // Fetch recommendations
+// Fetch recommendations
+const cartProductIds = items
+  .filter(item => item._id)
+  .map(item => item._id);
+
+getRecommendations(cartProductIds)
+  .then(res => {
+    if (res.success) {
+      setRecommendations(res.data);
+    }
+  })
+  .catch(err => console.error("Failed to load recommendations:", err));
   }, []);
 
   const handleChange = (e) => {
@@ -76,38 +92,40 @@ const [form, setForm] = useState({
     try {
       setIsSubmitting(true);
 
-      const orderData = {
-  paymentMethod: form.paymentMethod,
-
+  const orderData = {
+  paymentMethod: form.paymentMethod || "COD",
   customer: {
-          name: form.name,
-          phone: form.phone,
-          address: form.address,
-          city: form.city,
-          postalCode: form.postalCode,
-        },
+    name: form.name,
+    phone: form.phone,
+    address: form.address,
+    city: form.city,
+    postalCode: form.postalCode,
+  },
+  // FIX: Log cartItems here to see why they are being filtered out
+  items: cartItems
+    .filter(item => {
+       const id = item._id || item.id || item.productId;
+       // Only filter out items that have NO id at all
+       return id !== undefined && id !== null;
+    })
+    .map((item) => ({
+      // Use whatever ID field is actually present
+      productId: item._id || item.id || item.productId, 
+      title: item.title,
+      price: Number(item.price),
+      quantity: Number(item.quantity) || 1,
+      previewImage: item.previewImage,
+    })),
+  totalPrice: Number(totalPrice),
+};
 
-        items: cartItems.map((item) => ({
-          productId: String(item.id),
-          title: item.title,
-          price: item.price,
-          quantity: item.quantity,
-          previewImage: item.previewImage,
-        })),
+console.log("DEBUG: Final items being sent:", orderData.items);
 
-        totalPrice,
-      };
+    const response = await createOrder(orderData);
 
-     const token = localStorage.getItem("userToken");
+    console.log("FINAL ORDER DATA:", orderData);
 
-const response = await createOrder(orderData, {
-  headers: {
-    Authorization: `Bearer ${token}`
-  }
-});
-
-      const orderId = response.data._id;
-
+const orderId = response.data._id || response._id;
       clearCart();
 
       navigate(`/success-page?orderId=${orderId}`);
@@ -321,6 +339,18 @@ const response = await createOrder(orderData, {
         </div>
 
       </div>
+
+      {/* Recommendations Section */}
+      {recommendations.length > 0 && (
+        <div className="mt-16 bg-white shadow-md rounded-xl p-6">
+          <h2 className="text-2xl font-bold mb-6">You may also like</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+            {recommendations.map(product => (
+              <ProductCard key={product._id} product={product} />
+            ))}
+          </div>
+        </div>
+      )}
 
     </div>
   );

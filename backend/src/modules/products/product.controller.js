@@ -3,8 +3,10 @@ import {
   getAllProducts,
   getProductById,
   updateProduct,
-  deleteProduct
+  deleteProduct,
+  getRecommendedProducts
 } from "./product.service.js";
+
 import cloudinary from "../../config/cloudinary.js";
 
 
@@ -60,7 +62,17 @@ export const getAllProductsController = async (req, res, next) => {
 // Get product by ID
 export const getProductByIdController = async (req, res, next) => {
   try {
-    const product = await getProductById(req.params.id);
+    const { id } = req.params;
+
+    // ✅ CRITICAL FIX: prevent invalid ObjectId crash
+    if (!id || id === "recommendations" || id.length !== 24) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid product ID"
+      });
+    }
+
+    const product = await getProductById(id);
 
     if (!product) {
       return res.status(404).json({
@@ -73,6 +85,7 @@ export const getProductByIdController = async (req, res, next) => {
       success: true,
       data: product
     });
+
   } catch (error) {
     next(error);
   }
@@ -117,6 +130,40 @@ export const deleteProductController = async (req, res, next) => {
       success: true,
       message: "Product deleted successfully"
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+/* =========================================================
+   NEW: Get Recommended Products Controller
+   ========================================================= */
+
+export const getRecommendedProductsController = async (req, res, next) => {
+  try {
+    // 1. Extract query param
+    const { cartProductIds } = req.query;
+
+    // 2. Convert to array (safe parsing)
+    let idsArray = [];
+
+    if (cartProductIds) {
+      idsArray = cartProductIds
+        .split(",")
+        .map(id => id.trim())
+        .filter(Boolean);
+    }
+
+    // 3. Call service
+    const recommendedProducts = await getRecommendedProducts(idsArray);
+
+    // 4. Return response
+    res.json({
+      success: true,
+      data: recommendedProducts
+    });
+
   } catch (error) {
     next(error);
   }

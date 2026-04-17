@@ -27,4 +27,17 @@ export const createOrder = async (orderData) => {
   return response.data;
 };
 
+/* Get Recommendations */
+export const getRecommendations = async (cartProductIds) => {
+  const ids = Array.isArray(cartProductIds)
+    ? cartProductIds.join(",")
+    : "";
+
+  const response = await API.get(
+    `/products/recommendations?cartProductIds=${ids}`
+  );
+
+  return response.data;
+};
+
 export default API;

@@ -1,4 +1,5 @@
 import Product from "./product.model.js";
+import mongoose from "mongoose";
 
 
 // Create new product
@@ -16,7 +17,13 @@ export const getAllProducts = async () => {
 
 
 // Get single product by ID
+
 export const getProductById = async (productId) => {
+  // 🔥 CRITICAL FIX: prevent invalid ObjectId crash
+  if (!mongoose.Types.ObjectId.isValid(productId)) {
+    return null; // safely return instead of crashing
+  }
+
   const product = await Product.findById(productId);
   return product;
 };
@@ -38,4 +45,73 @@ export const updateProduct = async (productId, updateData) => {
 export const deleteProduct = async (productId) => {
   const deletedProduct = await Product.findByIdAndDelete(productId);
   return deletedProduct;
+};
+
+
+/* =========================================================
+   NEW: Get Recommended Products (SAFE ADDITION)
+   ========================================================= */
+
+export const getRecommendedProducts = async (cartProductIds = []) => {
+  try {
+    // 1. Ensure array
+    if (!Array.isArray(cartProductIds)) {
+      cartProductIds = [];
+    }
+
+    // 2. 🔥 CRITICAL FIX: filter valid Mongo ObjectIds only
+    const validIds = cartProductIds.filter(id =>
+      mongoose.Types.ObjectId.isValid(id)
+    );
+
+    // 3. If no valid IDs → return random products
+    if (validIds.length === 0) {
+      const randomProducts = await Product.aggregate([
+        { $sample: { size: 4 } }
+      ]);
+      return randomProducts;
+    }
+
+    // 4. Fetch cart products safely
+    const cartProducts = await Product.find({
+      _id: { $in: validIds }
+    });
+
+    // 5. Extract categories (if exists)
+    const categories = cartProducts
+      .map(p => p.category)
+      .filter(Boolean);
+
+    let recommendedProducts = [];
+
+    // 6. If category exists → find similar products
+    if (categories.length > 0) {
+      recommendedProducts = await Product.find({
+        category: { $in: categories },
+        _id: { $nin: validIds } // exclude cart items
+      })
+        .limit(4)
+        .sort({ createdAt: -1 });
+    }
+
+    // 7. Fallback → random (excluding cart items)
+    if (!recommendedProducts || recommendedProducts.length === 0) {
+      recommendedProducts = await Product.aggregate([
+        {
+          $match: {
+            _id: { $nin: validIds }
+          }
+        },
+        { $sample: { size: 4 } }
+      ]);
+    }
+
+    return recommendedProducts;
+
+  } catch (error) {
+    console.error("Error in getRecommendedProducts:", error);
+
+    // 🔒 NEVER crash API
+    return [];
+  }
 };

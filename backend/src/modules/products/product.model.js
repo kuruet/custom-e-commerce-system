@@ -29,6 +29,15 @@ const productSchema = new mongoose.Schema(
       required: true,
       default: 0,
       min: 0
+    },
+
+    /* =========================================================
+       NEW: Category (SAFE ADDITION)
+       ========================================================= */
+    category: {
+      type: String,
+      trim: true,
+      default: null
     }
   },
   {
