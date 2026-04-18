@@ -18,7 +18,7 @@ const startServer = async () => {
     // Start background jobs AFTER DB is ready
     startCronJobs();
 
-    console.log("EMAIL CONFIG:", process.env.EMAIL_USER);
+
 
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
