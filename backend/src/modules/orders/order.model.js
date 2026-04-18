@@ -2,6 +2,12 @@ import mongoose from "mongoose";
 
 const orderSchema = new mongoose.Schema(
   {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: false
+    },
+
     customer: {
       name: String,
       phone: String,
@@ -31,9 +37,20 @@ const orderSchema = new mongoose.Schema(
 
     totalPrice: Number,
 
-    paymentMethod: {
+paymentMethod: {
   type: String,
-  default: "COD"
+  enum: ["COD", "ONLINE"],
+  default: "COD",
+},
+
+paymentStatus: {
+  type: String,
+  enum: ["PENDING", "PAID"],
+  default: "PENDING",
+},
+
+paymentId: {
+  type: String,
 },
 
     status: {
@@ -44,6 +61,7 @@ const orderSchema = new mongoose.Schema(
   {
     timestamps: true,
   }
+  
 );
 
 export default mongoose.model("Order", orderSchema);

@@ -1,6 +1,10 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import API from "../services/api";
+import WishlistButton from "../features/wishlist/components/WishlistButton";
+import RecommendationCarousel from "../features/recommendations/components/RecommendationCarousel";
+import { trackProductView } from "../features/email/services/email.api.js";
+
 
 const ProductDetails = () => {
 
@@ -16,11 +20,9 @@ const ProductDetails = () => {
 
   const fetchProduct = async () => {
     try {
-
       const response = await API.get(`/products/${id}`);
-
       setProduct(response.data.data);
-
+      trackProductView(id);
     } catch (error) {
       console.error("Failed to fetch product", error);
     }
@@ -59,9 +61,16 @@ const ProductDetails = () => {
 >
   Customize Product
 </button>
+<div className="mt-4">
+  <WishlistButton />
+</div>
 
         </div>
 
+      </div>
+
+      <div className="mt-12">
+        <RecommendationCarousel />
       </div>
 
     </div>

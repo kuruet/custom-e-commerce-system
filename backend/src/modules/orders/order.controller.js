@@ -32,7 +32,9 @@ export const createOrder = async (req, res) => {
       // This allows 'custom-xxx', '1', and standard ObjectIds to all pass through.
     }
 
-    const order = await orderService.createOrder(req.body);
+    // Attach userId if available (needed for loyalty points)
+    const orderData = { ...req.body, userId: req.user?._id };
+    const order = await orderService.createOrder(orderData);
     
     res.status(201).json({
       success: true,

@@ -1,5 +1,6 @@
 import Product from "./product.model.js";
 import mongoose from "mongoose";
+import eventBus from "../../utils/eventBus.js";
 
 
 // Create new product
@@ -11,9 +12,13 @@ export const createProduct = async (productData) => {
 
 // Get all products
 export const getAllProducts = async () => {
-  const products = await Product.find().sort({ createdAt: -1 });
+  const products = await Product.find()
+    .select("title price image category stock description")
+    .sort({ createdAt: -1 })
+    .limit(50);
   return products;
 };
+
 
 
 // Get single product by ID
@@ -29,13 +34,30 @@ export const getProductById = async (productId) => {
 };
 
 
-// Update product
+// Update product — emits PRODUCT_UPDATED for wishlist alert detection
 export const updateProduct = async (productId, updateData) => {
+  // Snapshot BEFORE update for comparison
+  const before = await Product.findById(productId, "price stock title");
+
   const updatedProduct = await Product.findByIdAndUpdate(
     productId,
     updateData,
     { new: true }
   );
+
+  // Emit non-blocking so update response is never delayed
+  if (before && updatedProduct) {
+    setImmediate(() => {
+      eventBus.emit("PRODUCT_UPDATED", {
+        productId,
+        title: before.title,
+        oldPrice: before.price,
+        newPrice: updatedProduct.price,
+        oldStock: before.stock,
+        newStock: updatedProduct.stock
+      });
+    });
+  }
 
   return updatedProduct;
 };

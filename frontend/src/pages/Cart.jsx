@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { getCartItems, clearCart } from "../utils/cartStorage";
-import CartItem from "../components/cart/CartItem";
+import CartItem from "../features/cart/components/CartItem";
 import { useNavigate } from "react-router-dom";
-import AuthModal from "../components/auth/AuthModal";
+import AuthModal from "../features/auth/components/AuthModal";
+import RewardsPanel from "../features/loyalty/components/RewardsPanel";
+
 
 export default function Cart() {
   const navigate = useNavigate();
@@ -339,6 +341,11 @@ export default function Cart() {
               <div className="summary-row" style={{ marginTop: 4 }}>
                 <span>Shipping</span>
                 <span style={{ color: "#16a34a", fontWeight: 500 }}>Free</span>
+              </div>
+
+              {/* Loyalty Rewards */}
+              <div style={{ marginTop: 16 }}>
+                <RewardsPanel />
               </div>
 
               {/* Total */}

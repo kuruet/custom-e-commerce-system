@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Search, User, ShoppingBag, Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import PointsBadge from "../../features/loyalty/components/PointsBadge";
+import WishlistDrawer from "../../features/wishlist/components/WishlistDrawer";
 
 const navLinks = [
 
@@ -15,12 +17,12 @@ const Header = ({ cartItemCount = 0 }) => {
 
   
 
-    const navigate = useNavigate();
-
-
+  const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const [wishlistOpen, setWishlistOpen] = useState(false);
+  const isLoggedIn = !!localStorage.getItem("userToken");
 
   const closeAll = () => {
     setMobileMenuOpen(false);
@@ -111,6 +113,23 @@ const Header = ({ cartItemCount = 0 }) => {
               <User size={20} />
             </button>
 
+            {/* Wishlist icon */}
+            {isLoggedIn && (
+              <button
+                onClick={() => setWishlistOpen(true)}
+                aria-label="Open wishlist"
+                className="text-zinc-400 hover:text-white transition-colors duration-200 p-1"
+                style={{ fontSize: 18, background: "none", border: "none", cursor: "pointer" }}
+              >
+                ♡
+              </button>
+            )}
+
+            {/* Loyalty points badge */}
+            {isLoggedIn && (
+              <PointsBadge />
+            )}
+
             {/* Cart */}
           <button
   onClick={handleLogout}
@@ -190,6 +209,9 @@ const Header = ({ cartItemCount = 0 }) => {
           className="md:hidden fixed inset-0 top-[72px] z-20 bg-black/50 backdrop-blur-sm"
         />
       )}
+
+      {/* Wishlist Drawer — global, mounted per header */}
+      <WishlistDrawer isOpen={wishlistOpen} onClose={() => setWishlistOpen(false)} />
     </>
   );
 };

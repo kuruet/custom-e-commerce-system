@@ -18,7 +18,7 @@ import AdminProtectedRoute from "./components/admin/AdminProtectedRoute";
 import AdminLogin from "./pages/admin/AdminLogin";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
-import UserProtectedRoute from "./components/auth/UserProtectedRoute";
+import UserProtectedRoute from "./features/auth/components/UserProtectedRoute";
 import ScrollToTop from "./components/common/ScrollToTop";
 
 function App() {

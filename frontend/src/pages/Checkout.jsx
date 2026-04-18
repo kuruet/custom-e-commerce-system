@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import { getCartItems, clearCart } from "../utils/cartStorage";
 import { useNavigate } from "react-router-dom";
 import { createOrder, getRecommendations } from "../services/api";
-import ProductCard from "../components/ProductCard";
+import ProductCard from "../components/common/ProductCard";
+import PointsBadge from "../features/loyalty/components/PointsBadge";
+
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -121,19 +123,127 @@ getRecommendations(cartProductIds)
 
 console.log("DEBUG: Final items being sent:", orderData.items);
 
-    const response = await createOrder(orderData);
+      // ── COD FLOW (existing — unchanged) ──────────────────────────────────
+      if (form.paymentMethod === "COD") {
 
-    console.log("FINAL ORDER DATA:", orderData);
+        const response = await createOrder(orderData);
 
-const orderId = response.data._id || response._id;
-      clearCart();
+        console.log("FINAL ORDER DATA:", orderData);
 
-      navigate(`/success-page?orderId=${orderId}`);
+        const orderId = response.data._id || response._id;
+        clearCart();
+
+        navigate(`/success-page?orderId=${orderId}`);
+
+      // ── ONLINE FLOW (Razorpay) ────────────────────────────────────────────
+      } else if (form.paymentMethod === "ONLINE") {
+
+        // Step 1: Create Razorpay order on backend
+        const razorpayOrderRes = await fetch(`${import.meta.env.VITE_API_URL}/payment/create-order`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ amount: Number(totalPrice) }),
+        });
+
+        const razorpayOrderData = await razorpayOrderRes.json();
+
+        if (!razorpayOrderData.success) {
+          throw new Error("Failed to create Razorpay order from backend.");
+        }
+
+        // Support both { id, amount } and { order: { id, amount } } response shapes
+        const rzpOrder = razorpayOrderData.order || razorpayOrderData;
+
+        // Step 2: Open Razorpay popup
+        const options = {
+          key: "rzp_test_SefM4Q9Y9W8ofN",
+          amount: rzpOrder.amount,
+          currency: rzpOrder.currency || "INR",
+          name: "Your Store",
+          description: "Order Payment",
+          order_id: rzpOrder.id,
+          prefill: {
+            name: form.name,
+            contact: form.phone,
+          },
+          theme: {
+            color: "#000000",
+          },
+          // Step 3: On payment success → verify → create order in DB → navigate
+          handler: async function (paymentResponse) {
+            try {
+              const verifyRes = await fetch(`${import.meta.env.VITE_API_URL}/payment/verify`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  razorpay_order_id: paymentResponse.razorpay_order_id,
+                  razorpay_payment_id: paymentResponse.razorpay_payment_id,
+                  razorpay_signature: paymentResponse.razorpay_signature,
+                  orderData: orderData,
+                }),
+              });
+
+              const verifyData = await verifyRes.json();
+
+              if (!verifyData.success) {
+                throw new Error("Payment verification failed.");
+              }
+
+              // Create order in DB after successful payment verification
+              const orderId = verifyData.order._id;
+
+              clearCart();
+
+              navigate(`/success-page?orderId=${orderId}`);
+
+            } catch (verifyError) {
+              console.error("Payment verification or order creation failed:", verifyError);
+              alert("Payment verification failed. Please contact support.");
+              setIsSubmitting(false);
+            }
+          },
+          modal: {
+            // Re-enable the button if the user closes the Razorpay popup
+            ondismiss: function () {
+              setIsSubmitting(false);
+            },
+          },
+        };
+
+        // Ensure Razorpay script is loaded
+        if (typeof window.Razorpay === "undefined") {
+          await new Promise((resolve, reject) => {
+            const script = document.createElement("script");
+            script.src = "https://checkout.razorpay.com/v1/checkout.js";
+            script.onload = resolve;
+            script.onerror = () => reject(new Error("Failed to load Razorpay SDK."));
+            document.body.appendChild(script);
+          });
+        }
+
+        const rzp = new window.Razorpay(options);
+
+        rzp.on("payment.failed", function (response) {
+          console.error("Razorpay payment failed:", response.error);
+          alert(`Payment failed: ${response.error.description}`);
+          setIsSubmitting(false);
+        });
+
+        rzp.open();
+
+        // NOTE: Do NOT set isSubmitting(false) here for ONLINE —
+        // it is handled inside handler() or ondismiss() above.
+        return;
+      }
+
     } catch (error) {
       console.error("Order creation failed:", error);
       alert("Failed to place order. Please try again.");
     } finally {
-      setIsSubmitting(false);
+      // For COD, always release. For ONLINE, handler/ondismiss manages it.
+      if (form.paymentMethod === "COD") {
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -180,6 +290,10 @@ const orderId = response.data._id || response._id;
                 </div>
               </div>
             ))}
+          </div>
+
+          <div className="mt-6">
+            <PointsBadge />
           </div>
 
           <div className="mt-6 border-t pt-4">
@@ -286,7 +400,8 @@ const orderId = response.data._id || response._id;
     Payment Method
   </h3>
 
-  <div className="border border-gray-300 rounded-lg p-4 flex items-center justify-between bg-gray-50">
+  {/* COD Option */}
+  <div className="border border-gray-300 rounded-lg p-4 flex items-center justify-between bg-gray-50 mb-3">
 
     <div className="flex items-center gap-3">
 
@@ -313,6 +428,38 @@ const orderId = response.data._id || response._id;
 
     <span className="text-green-600 font-semibold text-sm">
       Available
+    </span>
+
+  </div>
+
+  {/* ONLINE / Razorpay Option */}
+  <div className="border border-gray-300 rounded-lg p-4 flex items-center justify-between bg-gray-50">
+
+    <div className="flex items-center gap-3">
+
+      <input
+        type="radio"
+        name="paymentMethod"
+        value="ONLINE"
+        checked={form.paymentMethod === "ONLINE"}
+        onChange={handleChange}
+        className="accent-black"
+      />
+
+      <div>
+        <p className="font-medium">
+          Pay Online (Razorpay)
+        </p>
+
+        <p className="text-sm text-gray-500">
+          Pay securely via UPI, Card, or Net Banking
+        </p>
+      </div>
+
+    </div>
+
+    <span className="text-blue-600 font-semibold text-sm">
+      Secure
     </span>
 
   </div>

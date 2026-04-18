@@ -1,5 +1,12 @@
 const requestLogger = (req, res, next) => {
-  console.log(`${req.method} ${req.url}`);
+  const start = Date.now();
+
+  res.on("finish", () => {
+    const ms = Date.now() - start;
+    const level = res.statusCode >= 500 ? "ERROR" : res.statusCode >= 400 ? "WARN" : "INFO";
+    console.log(`[API] [${level}] ${req.method} ${req.originalUrl} → ${res.statusCode} (${ms}ms)`);
+  });
+
   next();
 };
 

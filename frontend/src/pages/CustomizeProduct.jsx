@@ -2,8 +2,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { addToCart } from "../utils/cartStorage";
 import { useState } from "react";
 
-import ProductCanvas from "../components/designer/ProductCanvas";
-import DesignToolbar from "../components/designer/DesignToolbar";
+import ProductCanvas from "../features/designer/components/ProductCanvas";
+import DesignToolbar from "../features/designer/components/DesignToolbar";
 
 export default function CustomizeProduct() {
   const navigate = useNavigate();

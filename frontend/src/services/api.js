@@ -21,6 +21,28 @@ API.interceptors.request.use(
   }
 );
 
+/* Global response interceptor */
+API.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const status = error.response?.status;
+
+    if (status === 401) {
+      // Token expired or invalid — clear and redirect to home
+      localStorage.removeItem("userToken");
+      if (window.location.pathname !== "/") {
+        window.location.href = "/";
+      }
+    }
+
+    if (status >= 500) {
+      console.error("[API] Server error:", error.response?.data?.message || error.message);
+    }
+
+    return Promise.reject(error);
+  }
+);
+
 /* Create Order */
 export const createOrder = async (orderData) => {
   const response = await API.post("/orders", orderData);
@@ -34,7 +56,7 @@ export const getRecommendations = async (cartProductIds) => {
     : "";
 
   const response = await API.get(
-    `/products/recommendations?cartProductIds=${ids}`
+    `/recommendations?cartIds=${ids}`
   );
 
   return response.data;

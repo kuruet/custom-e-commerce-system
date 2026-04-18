@@ -14,6 +14,7 @@
 
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useEmail } from "../../features/email/hooks/useEmail.js";
 import { Instagram, Linkedin, Youtube, Twitter, ChevronDown } from "lucide-react";
 
 // ─── Navigation data ─────────────────────────────────────────────────────────
@@ -156,6 +157,13 @@ const NavColumn = ({ col, isOpen, onToggle }) => (
 
 const Footer = () => {
   const [openSection, setOpenSection] = useState(null);
+  const { subscribe, loading, error, success } = useEmail();
+  const [email, setEmail] = useState("");
+
+  const handleSubscribe = async (e) => {
+    e.preventDefault();
+    if (email) await subscribe(email);
+  };
 
   const toggle = (id) =>
     setOpenSection((prev) => (prev === id ? null : id));
@@ -273,8 +281,45 @@ const Footer = () => {
               ))}
             </div>
 
+            {/* ── Email Capture Section ── */}
+            <div className="mt-16 pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-6 email-capture max-w-4xl mx-auto opacity-0 footer-fadein" style={{ animationDelay: "0.2s" }}>
+              <div className="text-center md:text-left">
+                <h3 className="text-xl font-semibold text-white mb-2">Get exclusive deals ✨</h3>
+                <p className="text-sm text-gray-300">Subscribe for early access and personalized offers.</p>
+              </div>
+              
+              <div className="w-full md:w-auto min-w-[300px]">
+                {success ? (
+                  <div className="px-6 py-3 bg-white/10 rounded-lg border border-green-500/30 text-green-400 text-center font-medium transition-all duration-500">
+                    🎉 Check your email!
+                  </div>
+                ) : (
+                  <form onSubmit={handleSubscribe} className="flex flex-col gap-2">
+                    <div className="flex gap-2">
+                      <input 
+                        type="email" 
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="Enter your email" 
+                        required
+                        className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-white/40 transition-colors"
+                      />
+                      <button 
+                        type="submit"
+                        disabled={loading}
+                        className="px-6 py-2 bg-white text-black font-semibold rounded-lg hover:scale-105 active:scale-95 transition-all disabled:opacity-70 disabled:hover:scale-100"
+                      >
+                        {loading ? "..." : "Subscribe"}
+                      </button>
+                    </div>
+                    {error && <div className="text-red-400 text-xs mt-1">❌ Failed to subscribe</div>}
+                  </form>
+                )}
+              </div>
+            </div>
+
             {/* ── Copyright bar ── */}
-            <div className="border-t border-white/10 mt-12 pt-6 text-center text-xs text-gray-400">
+            <div className="mt-10 pt-6 text-center text-xs text-gray-400">
               © {new Date().getFullYear()} Nynth Studio. All rights reserved.
             </div>
           </div>

@@ -19,6 +19,27 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true
+    },
+
+    points: {
+      type: Number,
+      default: 0,
+      min: 0
+    },
+
+    emailSubscribed: {
+      type: Boolean,
+      default: false
+    },
+
+    emailPreferences: {
+      priceDrops: { type: Boolean, default: true },
+      recommendations: { type: Boolean, default: true }
+    },
+
+    preferences: {
+      categories: [String],
+      lastViewed: [String] // product IDs as string for compatibility
     }
   },
   {
