@@ -13,8 +13,9 @@ export const subscribe = async (req, res) => {
       return res.status(400).json({ success: false, message: "Valid email is required" });
     }
 
-    const result = await emailService.subscribeEmail(email, userId);
-    res.status(200).json(result);
+    console.log("🚀 Email trigger fired");
+    emailService.subscribeEmail(email, userId); // ❗ NO await
+    res.status(200).json({ success: true, message: "Subscription logic triggered" });
   } catch (error) {
     res.status(500).json({ success: false, message: "Subscription failed" });
   }

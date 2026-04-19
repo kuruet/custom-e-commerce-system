@@ -1,26 +1,48 @@
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
 
+console.log("EMAIL USER:", process.env.EMAIL_USER);
+console.log("EMAIL PASS LENGTH:", process.env.EMAIL_PASS?.length);
+
+transporter.verify(function (error, success) {
+  if (error) {
+    console.error("❌ SMTP CONNECTION FAILED:", error);
+  } else {
+    console.log("✅ SMTP SERVER READY");
+  }
+});
+
+/**
+ * SAFE NON-BLOCKING EMAIL
+ */
 export const sendEmail = async ({ to, subject, html }) => {
+  console.log("📧 Attempting email to:", to);
+
+  // 🔥 HARD TIMEOUT PROTECTION (IMPORTANT)
+  const timeoutPromise = new Promise((_, reject) =>
+    setTimeout(() => reject(new Error("Email timeout")), 5000)
+  );
+
   try {
-    console.log("📧 Sending via Resend:", to);
-    console.log("🚀 FINAL EMAIL RECEIVER:", to);
+    await Promise.race([
+      transporter.sendMail({
+        from: `"Nynth Studio" <${process.env.EMAIL_USER}>`,
+        to,
+        subject,
+        html,
+      }),
+      timeoutPromise,
+    ]);
 
-    if (!process.env.RESEND_API_KEY) {
-      console.error("❌ Missing RESEND_API_KEY");
-      return;
-    }
-
-    const response = await resend.emails.send({
-      from: "Nynth Studio <onboarding@resend.dev>",
-      to,
-      subject,
-      html,
-    });
-
-    console.log("✅ Email sent:", response);
+    console.log("✅ Email sent successfully");
   } catch (error) {
-    console.error("❌ EMAIL ERROR:", error);
+    console.error("❌ EMAIL ERROR:", error.message);
   }
 };
