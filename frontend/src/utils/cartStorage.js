@@ -20,6 +20,7 @@ export const addToCart = (item) => {
     cart.push({
       ...item,
       quantity: item.quantity || 1,
+      size: item.size || null,
     });
   }
 
@@ -46,6 +47,15 @@ export const updateQuantity = (id, quantity) => {
   item.quantity = quantity;
 
   saveCart(cart);
+};
+
+export const updateItemSize = (id, size) => {
+  const cart = getCartItems();
+  const item = cart.find((c) => c.id === id);
+  if (item) {
+    item.size = size;
+    saveCart(cart);
+  }
 };
 
 export const clearCart = () => {

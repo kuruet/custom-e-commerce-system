@@ -11,6 +11,7 @@ export default function Cart() {
   const [cartItems, setCartItems] = useState([]);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [isClearing, setIsClearing] = useState(false);
+  const [checkoutError, setCheckoutError] = useState("");
 
   const handleAuthSuccess = () => {
     setShowAuthModal(false);
@@ -19,6 +20,7 @@ export default function Cart() {
 
   const refreshCart = () => {
     setCartItems(getCartItems());
+    setCheckoutError("");
   };
 
   useEffect(() => {
@@ -26,6 +28,13 @@ export default function Cart() {
   }, []);
 
   const handleProceedToCheckout = () => {
+    const hasUnselectedSize = !cartItems.every(item => item.size);
+    if (hasUnselectedSize) {
+      setCheckoutError("Please select a size for all items before proceeding.");
+      return;
+    }
+
+    setCheckoutError("");
     const token = localStorage.getItem("userToken");
     if (!token) {
       setShowAuthModal(true);
@@ -328,10 +337,17 @@ export default function Cart() {
               {/* Line items */}
               <div>
                 {cartItems.map((item, i) => (
-                  <div className="summary-row" key={i}>
-                    <span style={{ maxWidth: 160, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                      {item.name} <span style={{ color: "#d1d5db" }}>×{item.quantity}</span>
-                    </span>
+                  <div className="summary-row" key={i} style={{ alignItems: "flex-start" }}>
+                    <div style={{ display: "flex", flexDirection: "column", maxWidth: 160 }}>
+                      <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {item.name} <span style={{ color: "#d1d5db" }}>×{item.quantity}</span>
+                      </span>
+                      {item.size && (
+                        <span style={{ fontSize: 12, color: "#9ca3af", marginTop: 2 }}>
+                          Size: {item.size}
+                        </span>
+                      )}
+                    </div>
                     <span>₹{(item.price * item.quantity).toLocaleString("en-IN")}</span>
                   </div>
                 ))}
@@ -355,10 +371,15 @@ export default function Cart() {
               </div>
 
               {/* Checkout button */}
+              {checkoutError && (
+                <div style={{ color: "#dc2626", fontSize: 13, marginTop: 12, marginBottom: 8, padding: "8px", backgroundColor: "#fef2f2", border: "1px solid #fecaca", borderRadius: "6px" }}>
+                  {checkoutError}
+                </div>
+              )}
               <button
                 className="btn-checkout"
                 onClick={handleProceedToCheckout}
-                style={{ width: "100%", padding: "14px 0", marginTop: 20 }}
+                style={{ width: "100%", padding: "14px 0", marginTop: checkoutError ? 8 : 20 }}
               >
                 Proceed to Checkout →
               </button>

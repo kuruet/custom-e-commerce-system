@@ -1,11 +1,12 @@
 import { useEffect, useRef } from "react";
 import { Canvas } from "fabric";
+import { loadDesignLocally } from "../utils/designPersistence";
+import { loadDesignIntoCanvas } from "../utils/loadCanvasDesign";
 
 import shirtWhite from "../../../assets/mockups/shirt-white.png";
 import shirtBlack from "../../../assets/mockups/shirt-black.png";
 import shirtRed from "../../../assets/mockups/shirt-red.png";
 import shirtBlue from "../../../assets/mockups/shirt-blue.png";
-
 
 export default function ProductCanvas({ color, setCanvasInstance }) {
 
@@ -35,6 +36,12 @@ export default function ProductCanvas({ color, setCanvasInstance }) {
 
     if (setCanvasInstance) {
       setCanvasInstance(fabricRef.current);
+    }
+
+    // Load saved design if it exists
+    const savedDesign = loadDesignLocally();
+    if (savedDesign && savedDesign.designJSON) {
+      loadDesignIntoCanvas(fabricRef.current, savedDesign.designJSON);
     }
 
     return () => fabricRef.current.dispose();
@@ -77,9 +84,6 @@ export default function ProductCanvas({ color, setCanvasInstance }) {
           left: 0
         }}
       />
-
-      {/* Print Area Guide */}
-     
 
     </div>
   );

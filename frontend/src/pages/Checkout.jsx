@@ -138,10 +138,14 @@ console.log("DEBUG: Final items being sent:", orderData.items);
       // ── ONLINE FLOW (Razorpay) ────────────────────────────────────────────
       } else if (form.paymentMethod === "ONLINE") {
 
+        const token = localStorage.getItem("userToken");
         // Step 1: Create Razorpay order on backend
         const razorpayOrderRes = await fetch(`${import.meta.env.VITE_API_URL}/payment/create-order`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { 
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          },
           body: JSON.stringify({ amount: Number(totalPrice) }),
         });
 
@@ -174,7 +178,10 @@ console.log("DEBUG: Final items being sent:", orderData.items);
             try {
               const verifyRes = await fetch(`${import.meta.env.VITE_API_URL}/payment/verify`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { 
+                  "Content-Type": "application/json",
+                  "Authorization": `Bearer ${token}`
+                },
                 body: JSON.stringify({
                   razorpay_order_id: paymentResponse.razorpay_order_id,
                   razorpay_payment_id: paymentResponse.razorpay_payment_id,

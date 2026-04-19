@@ -5,3 +5,9 @@ export const fetchChatHistory = () =>
 
 export const sendChatMessage = (message) =>
   API.post("/chat", { message }).then(r => r.data);
+
+export const getProducts = () =>
+  API.get("/products").then(r => r.data);
+
+export const getRecommendations = () =>
+  API.post("/recommendations/chat", {}).then((r) => r.data).catch(() => ({ success: true, data: [] }));

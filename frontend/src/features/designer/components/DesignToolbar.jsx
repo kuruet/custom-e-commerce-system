@@ -1,115 +1,90 @@
-import { Textbox, Image } from "fabric";
-import html2canvas from "html2canvas";
-import ColorSelector from "./ColorSelector";
+import TextColorPicker from "./TextColorPicker";
+import {
+  addText,
+  uploadImage,
+  generatePreview,
+  applyTextColor
+} from "../utils/designerActions";
+import { saveDesignLocally, loadDesignLocally } from "../utils/designPersistence";
+import { loadDesignIntoCanvas } from "../utils/loadCanvasDesign";
 
-export default function DesignToolbar({ setColor, canvas, setPreview }) {
+export default function DesignToolbar({ canvas, setPreview, textColor, setTextColor }) {
 
-  // PRINT AREA CENTER
-  const centerX = 210;
-  const centerY = 190;
-
-  const addText = () => {
-
-    if (!canvas) return;
-
-    const text = new Textbox("Your Text", {
-      left: centerX,
-      top: centerY,
-      originX: "center",
-      originY: "center",
-      fontSize: 24,
-      fill: "black"
-    });
-
-    canvas.add(text);
-    canvas.setActiveObject(text);
-    canvas.renderAll();
+  const handleColorChange = (color) => {
+    setTextColor(color);
+    applyTextColor(canvas, color);
   };
 
-
-  const uploadLogo = async (event) => {
-
+  const saveCurrentDesign = () => {
     if (!canvas) return;
-
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-
-    reader.onload = async (e) => {
-
-      const img = await Image.fromURL(e.target.result);
-
-      img.scaleToWidth(100);
-
-      img.set({
-        left: centerX,
-        top: centerY,
-        originX: "center",
-        originY: "center"
-      });
-
-      canvas.add(img);
-      canvas.setActiveObject(img);
-      canvas.renderAll();
-
-    };
-
-    reader.readAsDataURL(file);
-
-    event.target.value = "";
-  };
-
-
-  const generatePreview = async () => {
-
-    const designer = document.getElementById("designer-area");
-    if (!designer) return;
-
-    const canvasImage = await html2canvas(designer);
-
-    const preview = canvasImage.toDataURL("image/png");
-
-    if (setPreview) {
-      setPreview(preview);
+    try {
+      const designJSON = canvas.toJSON();
+      const previewImage = canvas.toDataURL({ format: "jpeg", quality: 0.6 });
+      saveDesignLocally({ designJSON, previewImage });
+      alert("Design saved successfully!");
+    } catch (err) {
+      console.error("Save error:", err);
     }
-
   };
 
+  const loadSavedDesign = async () => {
+    if (!canvas) return;
+    const savedDesign = loadDesignLocally();
+    if (savedDesign && savedDesign.designJSON) {
+      await loadDesignIntoCanvas(canvas, savedDesign.designJSON);
+    } else {
+      alert("No saved design found.");
+    }
+  };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
 
-      <ColorSelector setColor={setColor} />
+      <TextColorPicker textColor={textColor} onChange={handleColorChange} />
 
       <button
-        onClick={addText}
+        onClick={() => addText(canvas, textColor)}
         className="w-full bg-black text-white py-2 rounded"
       >
         Add Text
       </button>
 
       <label className="w-full block">
-
         <input
           type="file"
           accept="image/*"
-          onChange={uploadLogo}
+          onChange={(e) => {
+            const file = e.target.files[0];
+            if (file) uploadImage(canvas, file);
+          }}
           className="hidden"
         />
-
         <div className="w-full bg-gray-800 text-white py-2 rounded text-center cursor-pointer">
           Upload Logo
         </div>
-
       </label>
 
       <button
-        onClick={generatePreview}
+        onClick={() => generatePreview(setPreview)}
         className="w-full bg-green-600 text-white py-2 rounded"
       >
-       Generate Preview
+        Generate Preview
       </button>
+
+      <div className="border-t border-gray-200 pt-3 space-y-2">
+        <button
+          onClick={saveCurrentDesign}
+          className="w-full border border-gray-800 text-gray-800 py-2 rounded hover:bg-gray-100 transition-colors"
+        >
+          Save Design
+        </button>
+        <button
+          onClick={loadSavedDesign}
+          className="w-full border border-gray-800 text-gray-800 py-2 rounded hover:bg-gray-100 transition-colors"
+        >
+          Load Saved Design
+        </button>
+      </div>
 
     </div>
   );
