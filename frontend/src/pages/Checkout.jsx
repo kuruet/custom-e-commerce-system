@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { createOrder, getRecommendations } from "../services/api";
 import ProductCard from "../components/common/ProductCard";
 import PointsBadge from "../features/loyalty/components/PointsBadge";
+import { useLoyalty } from "../features/loyalty/hooks/useLoyalty.js";
+import { calculateDiscount } from "../features/loyalty/utils/loyaltyCalculator.js";
 
 
 const Checkout = () => {
@@ -13,6 +15,9 @@ const Checkout = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
   const [recommendations, setRecommendations] = useState([]);
+  
+  const { points: availablePoints, loading: loyaltyLoading } = useLoyalty();
+  const [selectedPoints, setSelectedPoints] = useState(0);
 
 const [form, setForm] = useState({
   name: "",
@@ -87,6 +92,9 @@ getRecommendations(cartProductIds)
     return sum + item.price * (item.quantity || 1);
   }, 0);
 
+  const discountAmount = calculateDiscount(selectedPoints);
+  const finalTotal = Math.max(totalPrice - discountAmount, 0);
+
   const handlePlaceOrder = async () => {
     if (isSubmitting) return;
     if (!validateForm()) return;
@@ -118,7 +126,9 @@ getRecommendations(cartProductIds)
       quantity: Number(item.quantity) || 1,
       previewImage: item.previewImage,
     })),
-  totalPrice: Number(totalPrice),
+  totalPrice: Number(finalTotal),
+  loyaltyPointsUsed: selectedPoints,
+  discountAmount: discountAmount,
 };
 
 console.log("DEBUG: Final items being sent:", orderData.items);
@@ -146,7 +156,7 @@ console.log("DEBUG: Final items being sent:", orderData.items);
             "Content-Type": "application/json",
             "Authorization": `Bearer ${token}`
           },
-          body: JSON.stringify({ amount: Number(totalPrice) }),
+          body: JSON.stringify({ amount: Number(finalTotal) }),
         });
 
         const razorpayOrderData = await razorpayOrderRes.json();
@@ -299,14 +309,49 @@ console.log("DEBUG: Final items being sent:", orderData.items);
             ))}
           </div>
 
-          <div className="mt-6">
-            <PointsBadge />
-          </div>
+          <div className="mt-6 border-t pt-4 space-y-3">
+            <div className="flex justify-between text-gray-600">
+              <span>Subtotal:</span>
+              <span>₹{totalPrice}</span>
+            </div>
 
-          <div className="mt-6 border-t pt-4">
-            <h3 className="text-lg font-semibold">
-              Total: ₹{totalPrice}
-            </h3>
+            {/* Loyalty Points Selection */}
+            {!loyaltyLoading && availablePoints > 0 && (
+              <div className="bg-orange-50 border border-orange-200 p-4 rounded-xl mt-4">
+                <div className="flex justify-between items-center mb-3">
+                  <h4 className="font-semibold text-orange-800 flex items-center gap-2">
+                    <PointsBadge /> Loyalty Discount
+                  </h4>
+                  <span className="text-sm font-medium text-orange-600">Available: {availablePoints} pts</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="number"
+                    min="0"
+                    max={availablePoints}
+                    value={selectedPoints}
+                    onChange={(e) => {
+                       const val = parseInt(e.target.value) || 0;
+                       setSelectedPoints(Math.min(Math.max(val, 0), availablePoints));
+                    }}
+                    className="w-24 border border-orange-300 p-2 rounded-lg outline-none focus:ring-2 focus:ring-orange-500 bg-white"
+                  />
+                  <span className="text-sm text-gray-700">points to use</span>
+                </div>
+              </div>
+            )}
+
+            {selectedPoints > 0 && (
+              <div className="flex justify-between text-green-600 font-medium">
+                <span>Discount:</span>
+                <span>-₹{discountAmount}</span>
+              </div>
+            )}
+
+            <div className="flex justify-between text-lg font-bold border-t pt-3">
+              <span>Total:</span>
+              <span>₹{finalTotal}</span>
+            </div>
           </div>
 
         </div>

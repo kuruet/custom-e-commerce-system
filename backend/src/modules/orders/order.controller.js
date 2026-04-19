@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import * as orderService from "./order.service.js";
+import * as loyaltyService from "../loyalty/loyalty.service.js";
 
 export const createOrder = async (req, res) => {
   try {
@@ -32,9 +33,29 @@ export const createOrder = async (req, res) => {
       // This allows 'custom-xxx', '1', and standard ObjectIds to all pass through.
     }
 
-    // Attach userId if available (needed for loyalty points)
-    const orderData = { ...req.body, userId: req.user?._id };
+    const POINT_TO_RUPEE = 10;
+    const loyaltyPointsUsed = Number(req.body.loyaltyPointsUsed) || 0;
+    
+    // BACKEND VALIDATION for loyalty points (DO NOT TRUST FRONTEND)
+    // 1. Calculate the true total price from the items array
+    const rawTotal = items.reduce((sum, item) => sum + (Number(item.price) * Number(item.quantity || 1)), 0);
+    const calculatedDiscount = loyaltyPointsUsed * POINT_TO_RUPEE;
+    const finalAmount = Math.max(rawTotal - calculatedDiscount, 0);
+    
+    const orderData = { 
+      ...req.body, 
+      userId: req.user?._id,
+      totalPrice: finalAmount,
+      loyaltyPointsUsed,
+      discountAmount: calculatedDiscount
+    };
+    
     const order = await orderService.createOrder(orderData);
+    
+    // If points used, deduct them
+    if (loyaltyPointsUsed > 0 && req.user?._id) {
+       await loyaltyService.redeemPoints(req.user._id, loyaltyPointsUsed);
+    }
     
     res.status(201).json({
       success: true,
